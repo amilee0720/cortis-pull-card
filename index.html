@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CORTIS - Final Fix v35</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --grey: #333333;
+            --mid-grey: #464646;
+            --header-h: 18vh;
+            --stage-h: 52vh;
+            --footer-h: 30vh;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        html, body {
+            width: 100%; height: 100dvh; margin: 0; padding: 0; overflow: hidden;
+            background: var(--bg); color: var(--grey);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            position: fixed;
+        }
+
+        .app { display: flex; flex-direction: column; width: 100%; height: 100dvh; 
+            padding-bottom: calc(env(safe-area-inset-bottom) + 15px);
+        }
+
+        .lang-switch {
+            position: absolute; 
+            top: 30px; right: 15px; z-index: 2000;
+            background: #fff; border: 1.5px solid var(--mid-grey); color: var(--mid-grey); padding: 3px 8px;
+            font-size: 0.7rem; font-weight: bold; cursor: pointer; border-radius: 50px;
+        }
+
+        header {
+            flex-shrink: 0; height: var(--header-h);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 10px 25px; text-align: center;
+        }
+        header h1 { margin: 0; font-size: 2.5rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--middle-gray)}
+        #quote { font-size: 0.9rem; color: #747373; margin-top: 8px; font-weight: 600; line-height: 1.3; min-height: 2.6em; }
+
+        main {
+            flex-shrink: 0; height: var(--stage-h);
+            display: flex; align-items: center; justify-content: center;
+            position: relative; width: 100%;
+            min-height: 0; 
+            margin-top: -30px;
+        }
+
+        .window {
+            position: relative; height: 95%; max-height: 400px; width: auto;
+            aspect-ratio: 2 / 3; background: #fff;
+            border-radius: 15px; border: 1px solid #eee;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden;
+        }
+
+        #photo { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 1; transition: transform 1s ease; }
+        
+        #canvas { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: 50; cursor: crosshair; touch-action: none;
+        }
+
+        #overlay {
+            position: absolute; inset: 0; z-index: 100;
+            background: rgba(255, 255, 255, 0.98);
+            display: flex; align-items: center; justify-content: center;
+            perspective: 1200px; transition: opacity 0.4s ease;
+        }
+
+        .card { width: 160px; height: 240px; position: relative; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        .card.flipped { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; border: 1.5px solid var(--mid-grey); display: flex; align-items: center; justify-content: center; }
+        .card-back { background: var(--mid-grey); color: #fff; font-size: 0.9rem; font-weight: bold; letter-spacing: 3px; }
+        .card-front { background: #fff; color: var(--mid-grey); transform: rotateY(180deg); font-size: 0.9rem; font-weight: 700; text-transform: uppercase; }
+
+        footer {
+            flex: 0 0 27%;
+            flex-shrink: 0; height: var(--footer-h);
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            padding-top: 10px;
+        }
+        .stats { font-size: 0.85rem; color: var(--mid-grey); display: flex; gap: 30px; margin-bottom: 12px; font-weight: 700; 
+            opacity: 0; 
+            transition: opacity 0.3s ease; 
+        }
+
+        .btn-group { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 120px; }
+        
+        .btn-base {
+            width: 80%; max-width: 240px; height: 50px;
+            border-radius: 50px; font-weight: 800; font-size: 1rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; text-transform: uppercase; border: none;
+        }
+        .btn-primary { background: var(--mid-grey); color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-secondary { background: #fff; color: var(--mid-grey); border: 2px solid var(--mid-grey); }
+        
+        .hidden-all { opacity: 0 !important; pointer-events: none !important; }
+
+        @keyframes breathing-float {
+            0% {
+                transform: translateY(0px);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            }
+            50% {
+                transform: translateY(-8px);
+                box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+                background-color: #555555;
+            }
+            100% {
+                transform: translateY(0px);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            }
+        }
+
+        .btn-active-float {
+            animation: breathing-float 2s ease-in-out infinite;
+            border: 1px solid var(--middle-black) !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <button class="lang-switch" onclick="toggleLanguage()">中文 / EN</button>
+    
+    <header>
+        <h1 id="title-main">CORTIS</h1>
+        <div id="quote">載入中...</div>
+    </header>
+
+    <main>
+        <div class="window">
+            <div id="photo"></div>
+            <canvas id="canvas"></canvas>
+            <div id="overlay">
+                <div id="card-obj" class="card">
+                    <div class="card-face card-back">CORTIS</div>
+                    <div id="card-name" class="card-face card-front">?</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer id="ui-footer">
+        <div class="stats">
+            <span><span id="label-progress">揭曉進度</span>: <span id="percent">0</span>%</span>
+            <span><span id="label-time">剩餘時間</span>: <span id="timer">15</span><span id="label-sec">秒</span></span>
+        </div>
+        <div class="btn-group" id="btn-group">
+            <button id="main-btn" class="btn-base btn-primary" onclick="handleMain()">抽取小卡</button>
+            <button id="redraw-btn" class="btn-base btn-secondary" style="display: none;" onclick="handleRedraw()">重新抽取</button>
+        </div>
+    </footer>
+</div>
+
+<script>
+    const i18n = {
+        zh: {
+            progress: "進度", time: "時間", sec: "秒",
+            pullBtn: "抽取小卡", breakBtn: "揭開真面目", redrawBtn: "不是本命？再抽一次",
+            pullAgain: "再抽一次", retryBtn: "再試一次",
+            shuffling: "重新洗牌中...", success: "完美解鎖 ✨", fail: "挑戰失敗...",
+            pullMsgs: [
+                "OMG! 是 {name}！",
+                "準備好了嗎？{name} 正在等你。",
+                "今天的幸運星是 {name}！",
+                "這絕對是命定的一抽：是 {name}！",    
+                "{name} 已就緒，正在等待你的靈感。",
+                "打破框架，看見最真實的 {name}。",
+                "快看！{name} 正在線條之外對你微笑。",
+                "噓... {name} 的秘密即將揭曉。"
+            ]        
+        },
+        en: {
+            progress: "Progress", time: "Time", sec: "s",
+            pullBtn: "PULL CARD", breakBtn: "UNVEIL NOW", redrawBtn: "NOT YOUR BIAS? RE-PULL",
+            pullAgain: "PULL AGAIN", retryBtn: "RETRY",
+            shuffling: "Shuffling...", success: "Perfect ✨", fail: "Failed!",
+            pullMsgs: [
+                "OMG! It's {name}!",
+                "Ready? {name} is waiting.",
+                "{name} is your lucky star!",
+                "Destiny has arrived: it's {name}!",
+                "{name} is ready for your creative touch.",
+                "Break the lines to see the real {name}.",
+                "Look! {name} is smiling from beyond.",
+                "Shh... {name}'s secret is about to reveal."
+            ]        
+        }
+    };
+
+    let currentLang = localStorage.getItem('cortis_lang') || 'zh';
+    let state = 'IDLE';
+    let selectedMember = null;
+    let selectedImg = null;
+    let timeLeft = 15, timerId = null, progressTimer = null;
+    const members2 = [
+        { name: 'MARTIN', img: 'https://picsum.photos/id/237/400/600' },
+        { name: 'JAMES', img: 'https://picsum.photos/id/1027/400/600' },
+        { name: 'JUHOON', img: 'https://picsum.photos/id/64/400/600' },
+        { name: 'SEONGHYEON', img: 'https://picsum.photos/id/91/400/600' },
+        { name: 'KEONHO', img: 'https://picsum.photos/id/338/400/600' }
+    ];
+
+    const members = [
+        { 
+            name: 'MARTIN', 
+            imgs: [
+                'https://i.meee.com.tw/MOYXYYH.jpg', //01
+                'https://i.meee.com.tw/SEXIiU3.jpg', //02
+                'https://i.meee.com.tw/zFRjemR.jpg', //03
+                'https://i.meee.com.tw/nybbReK.jpg', //04
+                'https://i.meee.com.tw/BFcRZlJ.jpg', //05
+                'https://i.meee.com.tw/Pc2u4J8.jpg', //06
+                'https://i.meee.com.tw/RnUITpD.jpg', //07
+                'https://i.meee.com.tw/Zb8FRRs.jpg', //08
+                'https://i.meee.com.tw/ZgqWbdW.jpg', //09
+                'https://i.meee.com.tw/JPuCVMj.jpg', //10
+                'https://i.meee.com.tw/cGxbgRL.jpg'  //11
+            ] 
+        },
+        { 
+            name: 'JAMES', 
+            imgs: [
+                'https://picsum.photos/id/1027/400/600',
+                'https://picsum.photos/id/1027/400/600',
+                'https://picsum.photos/id/1027/400/600',
+                'https://picsum.photos/id/1027/400/600',
+                'https://picsum.photos/id/1027/400/600'
+            ] 
+        },
+        { 
+            name: 'JUHOON', 
+            imgs: [
+                'https://picsum.photos/id/64/400/600',
+                'https://picsum.photos/id/64/400/600',
+                'https://picsum.photos/id/64/400/600',
+                'https://picsum.photos/id/64/400/600',
+                'https://picsum.photos/id/64/400/600'
+            ] 
+        },
+        { 
+            name: 'SEONGHYEON', 
+            imgs: [
+                'https://picsum.photos/id/91/400/600',
+                'https://picsum.photos/id/91/400/600',
+                'https://picsum.photos/id/91/400/600',
+                'https://picsum.photos/id/91/400/600',
+                'https://picsum.photos/id/91/400/600'
+            ] 
+        },
+        { 
+            name: 'KEONHO', 
+            imgs: [
+                'https://picsum.photos/id/338/400/600',
+                'https://picsum.photos/id/338/400/600',
+                'https://picsum.photos/id/338/400/600',
+                'https://picsum.photos/id/338/400/600',
+                'https://picsum.photos/id/338/400/600'
+            ] 
+        }
+    ];
+
+    const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const photo = document.getElementById('photo'), overlay = document.getElementById('overlay');
+    const mainBtn = document.getElementById('main-btn'), redrawBtn = document.getElementById('redraw-btn');
+    const quoteBox = document.getElementById('quote'), btnGroup = document.getElementById('btn-group');
+
+    let currentPullMsgIdx = 0;
+
+    function updateUI() {
+        const lang = i18n[currentLang];
+        document.getElementById('label-progress').innerText = lang.progress;
+        document.getElementById('label-time').innerText = lang.time;
+        document.getElementById('label-sec').innerText = lang.sec;
+
+        if (state === 'IDLE') {
+            mainBtn.innerText = lang.pullBtn;
+            redrawBtn.style.display = 'none';
+            quoteBox.innerText ="";
+            btnGroup.classList.remove('hidden-all');
+        } else if (state === 'DRAWN') {
+            mainBtn.innerText = lang.breakBtn;
+            mainBtn.classList.add('btn-active-float'); 
+            redrawBtn.innerText = lang.redrawBtn;
+            redrawBtn.style.display = 'flex';
+            btnGroup.classList.remove('hidden-all');
+            quoteBox.innerText = lang.pullMsgs[currentPullMsgIdx].replace("{name}", selectedMember.name);
+        } else if (state === 'PLAYING') {
+            btnGroup.classList.add('hidden-all');
+            mainBtn.classList.remove('btn-active-float'); 
+        } else if (state === 'END') {
+            btnGroup.classList.remove('hidden-all');
+            mainBtn.classList.remove('btn-active-float'); 
+            redrawBtn.style.display = 'none';
+            const win = parseInt(document.getElementById('percent').innerText) >= 80;
+            mainBtn.innerText = win ? lang.pullAgain : lang.retryBtn;
+            quoteBox.innerText = win ? lang.success : lang.fail;
+        }
+    }
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'zh' ? 'en' : 'zh';
+        localStorage.setItem('cortis_lang', currentLang); 
+        updateUI();
+    }
+
+    window.onload = updateUI;
+
+    function handleMain() {
+        if (state === 'IDLE') pull();
+        else if (state === 'DRAWN') startPlay();
+        else if (state === 'END') {
+
+        document.querySelector('.stats').style.opacity = '0'; 
+        location.reload(); 
+        }
+    }
+
+    function pull() {
+        selectedMember = members[Math.floor(Math.random() * members.length)];
+        selectedImg = selectedMember.imgs[Math.floor(Math.random() * selectedMember.imgs.length)];
+
+        document.getElementById('card-name').innerText = selectedMember.name;
+        document.getElementById('card-obj').classList.add('flipped');
+        state = 'DRAWN';
+
+        currentPullMsgIdx = Math.floor(Math.random() * i18n[currentLang].pullMsgs.length);        
+        updateUI();
+    }
+
+    function handleRedraw() {
+        document.getElementById('card-obj').classList.remove('flipped');
+        state = 'IDLE';
+        redrawBtn.style.display = 'none';
+        quoteBox.innerText = i18n[currentLang].shuffling;
+        setTimeout(pull, 400);
+        document.querySelector('.stats').style.opacity = '0';
+    }
+
+    function startPlay() {
+        state = 'PLAYING';
+        updateUI();
+        document.querySelector('.stats').style.opacity = '1';
+        overlay.style.opacity = "0";
+        setTimeout(() => overlay.style.display = "none", 400);
+        
+        photo.style.backgroundImage = `url('${selectedImg}')`;
+        
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        canvas.style.zIndex = "500";
+
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = '#eeeeee';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+
+        timeLeft = 15;
+        timerId = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = timeLeft;
+            if (timeLeft <= 0) endPlay();
+        }, 1000);
+        progressTimer = setInterval(calcProgress, 500);
+    }
+
+    let isDrawing = false;
+    
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+    }
+
+    function paint(e) {
+        if (!isDrawing || state !== 'PLAYING') return;
+        if (e.cancelable) e.preventDefault();
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 15, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    canvas.addEventListener('pointerdown', (e) => { isDrawing = true; paint(e); });
+    window.addEventListener('pointermove', paint);
+    window.addEventListener('pointerup', () => isDrawing = false);
+    
+    canvas.addEventListener('touchstart', (e) => { isDrawing = true; paint(e); }, {passive:false});
+    canvas.addEventListener('touchmove', paint, {passive:false});
+    canvas.addEventListener('touchend', () => isDrawing = false);
+
+    function calcProgress() {
+        if (state !== 'PLAYING') return;
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let clear = 0;
+        for (let i = 3; i < data.length; i += 64) { if (data[i] === 0) clear++; }
+        const percent = Math.round((clear / (data.length / 64)) * 100);
+        document.getElementById('percent').innerText = percent;
+        if (percent >= 80) endPlay();
+    }
+
+    function endPlay() {
+        clearInterval(timerId);
+        clearInterval(progressTimer);
+        const win = parseInt(document.getElementById('percent').innerText) >= 80;
+        if (win) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            photo.style.transform = "scale(1.05)";
+        }
+        state = 'END';
+        canvas.style.zIndex = "50";
+        updateUI();
+    }
+</script>
+</body>
+</html>
