@@ -137,18 +137,26 @@
         .scratch-hint {
             position: absolute;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            left: 0; 
+            width: 100%;
+            transform: translateY(-50%);
             z-index: 60;
             pointer-events: none;
             display: none;
             opacity: 0;
             text-align: center;
+            transition: opacity 0.5s;
         }
 
         @keyframes hint-pulse {
-            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.05); }
+            0%, 100% { 
+                opacity: 0.3; 
+                transform: translateY(-50%) scale(1); 
+            }
+            50% { 
+                opacity: 0.7; 
+                transform: translateY(-50%) scale(1.08); 
+            }
         }
 
         .scratch-hint.active {
@@ -161,10 +169,10 @@
             font-weight: 700;
             font-size: 0.6rem;
             letter-spacing: 2px;
-            
+            text-transform: uppercase;
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-            white-space: nowrap;  /* 強制文字永遠維持在一行，不准換行 */
-            display: inline-block; /* 確保寬度計算正確 */
+            white-space: nowrap;
+            display: inline-block;
         }
 
     </style>
@@ -660,8 +668,8 @@
 
         const hint = document.getElementById('scratch-hint');
         if (hint) {
-            hint.style.display = "block"; // 1. 強制恢復顯示
-            // 給瀏覽器一個極短的時間 (10ms) 反應，這樣淡入動畫才跑得出來
+            hint.style.display = "block"; 
+
             setTimeout(() => {
                 hint.classList.add('active');
                 hint.style.opacity = "1";
@@ -695,7 +703,7 @@
             hint.classList.remove('active');
             hint.style.opacity = "0";
             setTimeout(() => {
-                if (state !== 'PLAYING') return; // 如果已經結束了就不動
+                if (state !== 'PLAYING') return;
                 hint.style.display = "none";
             }, 500);        
         }
