@@ -73,9 +73,12 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1); z-index: 1;
         }
 
-        .app.lang-zh .pill-thumb { transform: translateX(24px); }
+        .app.lang-zh .pill-thumb { transform: translateX(0px); }
         .app.lang-zh #label-zh { color: var(--mid-grey); }
+        .app.lang-zh #label-en { color: #aaa; }
+        .app.lang-en .pill-thumb { transform: translateX(24px); }
         .app.lang-en #label-en { color: var(--mid-grey); }
+        .app.lang-en #label-zh { color: #aaa; }
 
         #quote { 
             font-size: 0.85rem; 
@@ -186,7 +189,6 @@
             font-weight: 700;
             font-size: 0.6rem;
             letter-spacing: 2px;
-            text-transform: uppercase;
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
             white-space: nowrap;
             display: inline-block;
@@ -237,7 +239,7 @@
         }
 
         .modal-prompt {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             color: var(--mid-grey);
             margin-bottom: 20px;
             font-weight: 800;
@@ -262,9 +264,9 @@
         }
 
         #user-name-input::placeholder {
-            color: #e3e3e3;
+            color: #a7a7a7;
             opacity: 1;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         #modal-btn {
@@ -275,6 +277,7 @@
             border: none;
             border-radius: 50px;
             font-weight: 800;
+            font-size: 0.85rem;
             cursor: pointer;
         }
 
@@ -301,7 +304,7 @@
         <p id="modal-intro" class="modal-intro"></p> 
         <p id="modal-prompt" class="modal-prompt"></p>
         
-        <input type="text" id="user-name-input" placeholder="輸入暱稱" maxlength="10">
+        <input type="text" id="user-name-input" placeholder="" maxlength="10">
         <button onclick="saveName()" id="modal-btn"></button>
     </div>
 </div>
@@ -311,8 +314,8 @@
         <h1 id="title-main">Your Daily CORTIS!</h1>
         <div class="header-side right">
             <div class="lang-switch-pill" onclick="toggleLanguage()">
-                <span id="label-en">EN</span>
                 <span id="label-zh">中</span>
+                <span id="label-en">EN</span>
                 <div class="pill-thumb"></div>
             </div>
         </div>
@@ -354,6 +357,7 @@
             scratchHint: " (刮開看照片）",
             nameIntro: "Hi, COER! <br>歡迎來到 Your Daily Cortis!<br>動手刮開驚喜，收藏男孩們閃耀的每一刻✨",
             namePrompt: "在開始之前，該怎麼稱呼你呢？",
+            namePlaceholder: "輸入暱稱...",
             nameBtn: "確定",
             welcomeMsgs: [
                 "嗨 {user} ！今天想遇見哪位團員呢？✨",
@@ -401,24 +405,25 @@
                 "✨ 每一像素都是驚喜，這張 {name} 值得 {user} 永久收藏",
                 "🥰 只要看到 {name}，{user} 的世界就被點亮了！"
             ],
-            copyright: "本網頁為 CORTIS 應援小作品，非官方發行。所有影像資源之版權均屬原經紀公司及版權方所有。本網頁僅供娛樂與技術交流使用，嚴禁任何商業行為。<br>© 2026 Your Daily CORTIS! by <a href='https://www.threads.net/@leeami0720' target='_blank' class='footer-link'>@leeami0720</a>"  
+            copyright: "本網頁為 CORTIS 應援小作品，非官方發行。所有影像資源之版權均屬原經紀公司所有。本網頁僅供娛樂與技術交流使用，嚴禁任何商業行為。<br>© 2026 Your Daily CORTIS! by <a href='https://www.threads.net/@leeami0720' target='_blank' class='footer-link'>@leeami0720</a>"  
         },
         en: {
             title: "Your Daily CORTIS!",
             pullBtn: "Pull Card", breakBtn: "Check the look!", redrawBtn: "Not your bias? Re-pull",
             pullAgain: "Pull Again", shuffling: "Shuffling...",
-            scratchHint: "(Scratch to see)", 
-            nameIntro: "Hi, COER! Welcome to Your Daily CORTIS!<br>Scratch to reveal surprises and collect the boys' shining moments ✨",
+            scratchHint: "(Scratch To See)", 
+            nameIntro: "Hi, COER! <br>Welcome to Your Daily CORTIS!<br>Scratch to reveal surprises and collect the boys' shining moments ✨",
             namePrompt: "Before we start, what is your name?",
-            nameBtn: "Let's Go ✨",
+            namePlaceholder: "Enter nickname...",
+            nameBtn: "Let's Go",
             welcomeMsgs: [
                 "Hi {user}! Which member do you want to meet today? ✨",
                 "How's your luck today, {user}? Pull a card to find out! 🔮",
                 "Ready for your daily dose of CORTIS energy, {user}? 💪",
                 "{user}, let's pull a special bias card just for you! 💖",
                 "Every card is a surprise. {user}, come and unveil yours! 🎁",
-                "{user}, who's the visual king today? Tap to find out! 📸",
-                "Heart racing, {user}... Feeling like a big surprise is coming! ⚡️",
+                "{user}, ready for today's Visual King? Tap to find out! 📸",
+                "Heart racing, {user}... It feels like a big surprise is coming! ⚡️",
                 "Can you hear it, {user}? A heart-fluttering call from CORTIS ✨",
                 "{user}, start your day with the most handsome card! 🌈",
                 "{user}, you have an exclusive card waiting to be claimed 💌"
@@ -430,8 +435,8 @@
                 "It's destiny: you've pulled {name}!",
                 "{name} is ready and waiting to meet you ✨",
                 "Break the lines to see the real {name}.",
-                "Look! {name} is smiling behind the mist.",
-                "Shh... {name}'s secret surprise is about to reveal.",
+                "Look! {name} is smiling from behind the mist.",
+                "Shh... {name}'s secret surprise is about to be revealed.",
                 "Can you hear it? It's a call from {name} 💖",
                 "Heart racing... I can see {name}'s silhouette!",
                 "The world's best {name} is arriving!",
@@ -440,22 +445,22 @@
                 "Ready for a surprise? It's the amazing {name}!",
                 "A special moment just for you and {name} 🎬"
             ],
-successMsgs: [
-                "✨ {user}, you've caught the brightest {name}! ",
-                "💖 {user}, this is your limited edition {name}! ",
-                "🌟 Perfect moment! {user} met the glowing {name} ",
-                "🎬 Successfully collected! {user} added {name} to the vault ",
-                "💎 Congrats {user}! You pulled this legendary {name}! ",
-                "🦄 Dreamy encounter! {name} is right by your side, {user} ",
-                "🌈 Peak luck! {user}, you actually found this {name}! ",
-                "📸 Screenshot time, {user}! {name}'s gaze is just too much ",
-                "🔥 Spotlight on! {user}, stunned by {name}'s aura? ",
-                "🧸 Congrats on unlocking, {user}! Take this special {name} with you ",
-                "🎨 Look {user}, this atmospheric {name} shows such unique charm ",
-                "⚡️ Heart-strike! {user}, hit by {name}'s stunning visuals? ",
-                "🕊️ Healing visuals! Let {name} brighten your day, {user} ",
-                "✨ Every pixel is a surprise! This {name} is a must-keep for {user} ",
-                "🥰 Just seeing {name} brightens up your whole world, {user}! "
+            successMsgs: [
+                "✨ {user}, you've caught the brightest {name}!",
+                "💖 {user}, this is your limited edition {name}!",
+                "🌟 A perfect moment! {user} just met the glowing {name}",
+                "🎬 Successfully collected! {user} has added {name} to the vault",
+                "💎 Congrats {user}! You pulled this legendary {name}!",
+                "🦄 Dreamy encounter! {name} is right by your side, {user}",
+                "🌈 Peak luck! {user}, you actually found this {name}!",
+                "📸 Screenshot time, {user}! {name}'s gaze is just too much",
+                "🔥 Spotlight on! {user}, stunned by {name}'s aura?",
+                "🧸 Congrats on unlocking, {user}! Take this special {name} with you",
+                "🎨 Check it out, {user}! This atmospheric shot of {name} radiates such unique charm",
+                "⚡️ Visual attack! {user}, are you hit by {name}'s stunning visuals?",
+                "🕊️ Healing visuals! Let {name} brighten your day, {user}",
+                "✨ Every pixel is a surprise! This {name} is a must-keep for {user}",
+                "🥰 Just seeing {name} brightens up your whole world, {user}!"
             ],
             copyright: "This is a non-official fan-made project for entertainment only. <br>All images belong to their respective agencies. No commercial use intended.<br>© 2026 Your Daily CORTIS! by <a href='https://www.threads.net/leeami0720' target='_blank' class='footer-link'>@leeami0720</a>"
         }
@@ -721,6 +726,9 @@ successMsgs: [
 
         const btnElem = document.getElementById('modal-btn');
         if(btnElem) btnElem.innerText = lang.nameBtn;
+
+        const inputElem = document.getElementById('user-name-input');
+        if (inputElem) inputElem.placeholder = lang.namePlaceholder;
 
         document.getElementById('title-main').innerText = lang.title;
         document.getElementById('copy-text').innerHTML = lang.copyright;
