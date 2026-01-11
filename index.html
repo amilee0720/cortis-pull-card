@@ -78,10 +78,16 @@
         .app.lang-en #label-en { color: var(--mid-grey); }
 
         #quote { 
-            font-size: 0.85rem; color: #747373; margin-top: 0px;
-            font-weight: 600; line-height: 1.2; min-height: 2.5em;
-            display: flex; align-items: center; justify-content: center;
-            text-align: center; padding: 0 10px; flex-shrink: 0;
+            font-size: 0.85rem; 
+            color: #747373; 
+            margin-top: 5px;
+            font-weight: 600; 
+            line-height: 1.4;
+            min-height: 3em;
+            display: block;
+            text-align: center;
+            padding: 0 20px; 
+            flex-shrink: 0;
         }
 
         main {
@@ -279,7 +285,7 @@
             cursor: pointer;
             font-weight: 900;
             transition: opacity 0.2s;
-            display: inline-block;
+            display: inline;
         }
 
         .user-clickable:hover {
@@ -707,8 +713,12 @@ successMsgs: [
     function updateUI() {
         const lang = i18n[currentLang];
 
+        const introElem = document.getElementById('modal-intro');
+        if (introElem) introElem.innerHTML = lang.nameIntro;
+
         const promptElem = document.getElementById('modal-prompt');
         if(promptElem) promptElem.innerText = lang.namePrompt;
+
         const btnElem = document.getElementById('modal-btn');
         if(btnElem) btnElem.innerText = lang.nameBtn;
 
@@ -752,6 +762,16 @@ successMsgs: [
     function toggleLanguage() {
         currentLang = currentLang === 'zh' ? 'en' : 'zh';
         localStorage.setItem('cortis_lang', currentLang); 
+        
+        const appCont = document.getElementById('app-container');
+        if (currentLang === 'zh') { 
+            appCont.classList.add('lang-zh'); 
+            appCont.classList.remove('lang-en'); 
+        } else { 
+            appCont.classList.add('lang-en'); 
+            appCont.classList.remove('lang-zh'); 
+        }
+        
         updateUI();
     }
 
@@ -762,18 +782,10 @@ successMsgs: [
     }
 
     function checkName() {
-        const lang = i18n[currentLang];
-        const introElem = document.getElementById('modal-intro');
-        if (introElem) introElem.innerHTML = lang.nameIntro;
-        
-        const promptElem = document.getElementById('modal-prompt');
-        if (promptElem) promptElem.innerText = lang.namePrompt;
-        
-        const btnElem = document.getElementById('modal-btn');
-        if (btnElem) btnElem.innerText = lang.nameBtn;
-
-        if (userName && document.getElementById('name-modal').style.display !== 'flex') {
-            document.getElementById('name-modal').style.display = 'none';
+        const modal = document.getElementById('name-modal');
+        if (userName && modal.style.display !== 'flex') {
+            modal.style.display = 'none';
+            return;
         }
     }
 
