@@ -44,10 +44,21 @@
         }
 
         .lang-switch-pill {
-            width: 58px; height: 28px; background: var(--switch-bg);
-            border-radius: 14px; position: relative; display: flex;
-            align-items: center; cursor: pointer; padding: 2px;
-            border: 1px solid #e5e5e5; user-select: none;
+            position: fixed;
+            top: 12px; 
+            right: 15px;
+            z-index: 4000;
+            width: 58px; 
+            height: 28px; 
+            background: var(--switch-bg);
+            border-radius: 14px; 
+            display: flex;
+            align-items: center; 
+            cursor: pointer; 
+            padding: 2px;
+            border: 1px solid #e5e5e5; 
+            user-select: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .lang-switch-pill span {
@@ -175,10 +186,119 @@
             display: inline-block;
         }
 
+        .name-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .name-box {
+            width: 85%;
+            max-width: 340px;
+            text-align: center;
+            background: #fff;
+            padding: 35px 25px;
+            border-radius: 30px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+        }
+
+        .name-box h2 {
+            margin: 0 0 10px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: var(--mid-grey);
+        }
+
+        .name-box p {
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .modal-intro {
+            font-size: 0.85rem;
+            color: #888;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .modal-prompt {
+            font-size: 0.95rem;
+            color: var(--mid-grey);
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        #user-name-input {
+            background: #f9f9f9;
+            border: 2px solid #eee;
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid #eee;
+            font-size: 0.8rem;
+            text-align: center;
+            outline: none;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        #user-name-input:focus {
+            border-color: var(--mid-grey);
+        }
+
+        #user-name-input::placeholder {
+            color: #e3e3e3;
+            opacity: 1;
+            font-size: 0.9rem;
+        }
+
+        #modal-btn {
+            width: 100%;
+            height: 50px;
+            background: var(--mid-grey);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .user-clickable {
+            color: var(--mid-grey);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            cursor: pointer;
+            font-weight: 900;
+            transition: opacity 0.2s;
+            display: inline-block;
+        }
+
+        .user-clickable:hover {
+            opacity: 0.6;
+        }
+
     </style>
 </head>
 <body class="lang-zh">
+<div id="name-modal" class="name-modal">
+    <div class="name-box">
 
+        <p id="modal-intro" class="modal-intro"></p> 
+        <p id="modal-prompt" class="modal-prompt"></p>
+        
+        <input type="text" id="user-name-input" placeholder="輸入暱稱" maxlength="10">
+        <button onclick="saveName()" id="modal-btn"></button>
+    </div>
+</div>
 <div class="app" id="app-container">
     <header class="header-row">
         <div class="header-side"></div>
@@ -226,6 +346,21 @@
             pullBtn: "抽取小卡", breakBtn: "揭開真面目", redrawBtn: "不是本命？再抽一次",
             pullAgain: "再抽一次", shuffling: "重新洗牌中...",
             scratchHint: " (刮開看照片）",
+            nameIntro: "Hi, COER! <br>歡迎來到 Your Daily Cortis!<br>動手刮開驚喜，收藏男孩們閃耀的每一刻✨",
+            namePrompt: "在開始之前，該怎麼稱呼你呢？",
+            nameBtn: "確定",
+            welcomeMsgs: [
+                "嗨 {user} ！今天想遇見哪位團員呢？✨",
+                "{user} ，今天的手氣如何？抽張小卡試試看吧！🔮",
+                "準備好接收今日份的 CORTIS 能量了嗎， {user}？💪",
+                "{user} ，來抽一張專屬於你今天的本命小卡吧！💖",
+                "每一張小卡都是一份驚喜， {user} 快來揭曉吧！🎁",
+                "{user} ，誰是今天的顏值擔當？動動手指就知道！📸",
+                "心跳加速中... {user} 感覺今天會抽到大驚喜喔！⚡️",
+                "聽到了嗎？是來自 CORTIS 給 {user} 的心動邀請 ✨",
+                "{user} ，用一張最帥氣的小卡，開啟你的美好心情吧 🌈",
+                "{user} ，這裡有一張你的專屬小卡尚未領取喔 💌"
+            ],
             pullMsgs: [
                 "OMG! 是 {name}！",
                 "準備好了嗎？{name} 正在等你。",
@@ -244,21 +379,21 @@
                 "這是專屬於你與 {name} 的互動時刻 🎬"
             ],
             successMsgs: [
-                "✨ 捕捉到最閃耀的 {name} 了！",
-                "💖 這是屬於你的限定 {name}！",
-                "🌟 完美的瞬間！{name} 正在發光",
-                "🎬 收藏成功！{name} 已入庫",
-                "💎 你抽到了這張傳說級的 {name}！",
-                "🦄 夢幻聯動！{name} 來到你身邊了",
-                "🌈 運氣爆棚！竟然遇到了這張 {name}",
-                "📸 快截圖！這張 {name} 的眼神太犯規了",
-                "🔥 全場焦點！{name} 的氣場真的很強",
-                "🧸 恭喜解鎖！把這份最特別的 {name} 帶走吧",
-                "🎨 充滿氛圍感的這一張，展現了 {name} 獨特的魅力",
-                "⚡️ 暴擊心動！被 {name} 的美貌擊中了嗎？",
-                "🕊️ 治癒系神顏，讓 {name} 陪你度過今天",
-                "✨ 每一像素都是驚喜，這張 {name} 真的太值得收藏了",
-                "🥰 只要看到 {name}，感覺整個人都被點亮了！"
+                "✨ {user}，捕捉到最閃耀的 {name} 了！",
+                "💖 {user}，這是屬於你的限定 {name}！",
+                "🌟 完美的瞬間！{user} 遇見了正在發光的 {name}",
+                "🎬 收藏成功！{user} 把 {name} 帶入庫了",
+                "💎 恭喜 {user}！你抽到了這張傳說級的 {name}！",
+                "🦄 夢幻聯動！{name} 來到 {user} 身邊了",
+                "🌈 運氣爆棚！{user} 竟然遇到了這張 {name}",
+                "📸 {user} 快截圖！這張 {name} 的眼神太犯規了",
+                "🔥 全場焦點！{user} 被 {name} 的氣場震撼到了嗎？",
+                "🧸 恭喜 {user} 解鎖！把這份最特別的 {name} 帶走吧",
+                "🎨 {user} 看，這張充滿氛圍感的 {name} 展現了獨特魅力",
+                "⚡️ 暴擊心動！{user} 被 {name} 的美貌擊中了嗎？",
+                "🕊️ 治癒系神顏，讓 {name} 陪 {user} 度過今天",
+                "✨ 每一像素都是驚喜，這張 {name} 值得 {user} 永久收藏",
+                "🥰 只要看到 {name}，{user} 的世界就被點亮了！"
             ],
             copyright: "本網頁為 CORTIS 應援小作品，非官方發行。所有影像資源之版權均屬原經紀公司及版權方所有。本網頁僅供娛樂與技術交流使用，嚴禁任何商業行為。<br>© 2026 Your Daily CORTIS! by <a href='https://www.threads.net/@leeami0720' target='_blank' class='footer-link'>@leeami0720</a>"  
         },
@@ -267,6 +402,21 @@
             pullBtn: "Pull Card", breakBtn: "Check the look!", redrawBtn: "Not your bias? Re-pull",
             pullAgain: "Pull Again", shuffling: "Shuffling...",
             scratchHint: "(Scratch to see)", 
+            nameIntro: "Hi, COER! Welcome to Your Daily CORTIS!<br>Scratch to reveal surprises and collect the boys' shining moments ✨",
+            namePrompt: "Before we start, what is your name?",
+            nameBtn: "Let's Go ✨",
+            welcomeMsgs: [
+                "Hi {user}! Which member do you want to meet today? ✨",
+                "How's your luck today, {user}? Pull a card to find out! 🔮",
+                "Ready for your daily dose of CORTIS energy, {user}? 💪",
+                "{user}, let's pull a special bias card just for you! 💖",
+                "Every card is a surprise. {user}, come and unveil yours! 🎁",
+                "{user}, who's the visual king today? Tap to find out! 📸",
+                "Heart racing, {user}... Feeling like a big surprise is coming! ⚡️",
+                "Can you hear it, {user}? A heart-fluttering call from CORTIS ✨",
+                "{user}, start your day with the most handsome card! 🌈",
+                "{user}, you have an exclusive card waiting to be claimed 💌"
+            ],
             pullMsgs: [
                 "OMG! It's {name}!",
                 "Ready? {name} is waiting for you.",
@@ -284,22 +434,22 @@
                 "Ready for a surprise? It's the amazing {name}!",
                 "A special moment just for you and {name} 🎬"
             ],
-            successMsgs: [
-                "✨ Caught the shining {name}!",
-                "💖 Your limited edition {name} is here!",
-                "🌟 Perfect! {name} is glowing!",
-                "🎬 Captured! {name} added to collection.",
-                "💎 You pulled a Legendary {name}!",
-                "🦄 Dreamy encounter! {name} is right by your side.",
-                "🌈 Peak luck! You've found the one and only {name}!",
-                "📸 Screenshot time! {name}'s gaze is just too much.",
-                "🔥 Spotlight on! {name}'s presence is unmatched.",
-                "🧸 Unlocked! Take this special {name} with you.",
-                "🎨 So much vibe! Showing {name}'s unique charm.",
-                "⚡️ Heart-strike! Stunned by {name}'s visuals?",
-                "🕊️ Healing vibes! Let {name} brighten your day.",
-                "✨ Every pixel is a masterpiece! {name} is a must-have.",
-                "🥰 Just seeing {name} makes everything better!"
+successMsgs: [
+                "✨ {user}, you've caught the brightest {name}! ",
+                "💖 {user}, this is your limited edition {name}! ",
+                "🌟 Perfect moment! {user} met the glowing {name} ",
+                "🎬 Successfully collected! {user} added {name} to the vault ",
+                "💎 Congrats {user}! You pulled this legendary {name}! ",
+                "🦄 Dreamy encounter! {name} is right by your side, {user} ",
+                "🌈 Peak luck! {user}, you actually found this {name}! ",
+                "📸 Screenshot time, {user}! {name}'s gaze is just too much ",
+                "🔥 Spotlight on! {user}, stunned by {name}'s aura? ",
+                "🧸 Congrats on unlocking, {user}! Take this special {name} with you ",
+                "🎨 Look {user}, this atmospheric {name} shows such unique charm ",
+                "⚡️ Heart-strike! {user}, hit by {name}'s stunning visuals? ",
+                "🕊️ Healing visuals! Let {name} brighten your day, {user} ",
+                "✨ Every pixel is a surprise! This {name} is a must-keep for {user} ",
+                "🥰 Just seeing {name} brightens up your whole world, {user}! "
             ],
             copyright: "This is a non-official fan-made project for entertainment only. <br>All images belong to their respective agencies. No commercial use intended.<br>© 2026 Your Daily CORTIS! by <a href='https://www.threads.net/leeami0720' target='_blank' class='footer-link'>@leeami0720</a>"
         }
@@ -310,9 +460,10 @@
     let selectedMember = null;
     let selectedImg = null;
     let progressTimer = null;
-
     let currentPullMsgIdx = 0;
     let currentSuccessMsgIdx = 0;
+    let userName = localStorage.getItem('cortis_user_name') || "";
+    let welcomeIdx = Math.floor(Math.random() * i18n.zh.welcomeMsgs.length); 
 
     const members = [
         { 
@@ -555,6 +706,12 @@
 
     function updateUI() {
         const lang = i18n[currentLang];
+
+        const promptElem = document.getElementById('modal-prompt');
+        if(promptElem) promptElem.innerText = lang.namePrompt;
+        const btnElem = document.getElementById('modal-btn');
+        if(btnElem) btnElem.innerText = lang.nameBtn;
+
         document.getElementById('title-main').innerText = lang.title;
         document.getElementById('copy-text').innerHTML = lang.copyright;
 
@@ -564,11 +721,15 @@
         if (currentLang === 'zh') { appCont.classList.add('lang-zh'); appCont.classList.remove('lang-en'); } 
         else { appCont.classList.add('lang-en'); appCont.classList.remove('lang-zh'); }
 
+        const displayUser = userName || (currentLang === 'zh' ? "朋友" : "Friend");
+        const userSpan = `&nbsp;<span class="user-clickable" onclick="resetUserName()">${displayUser}</span>&nbsp`;
+
         if (state === 'IDLE') {
             mainBtn.innerText = lang.pullBtn;
             mainBtn.classList.remove('btn-active-float');
             redrawBtn.style.display = 'none';
-            quoteBox.innerText = "";
+            let msg = lang.welcomeMsgs[welcomeIdx];
+            quoteBox.innerHTML = msg.replace("{user}", userSpan);             
             canvas.classList.remove('active');
         } else if (state === 'DRAWN') {
             mainBtn.innerText = lang.breakBtn;
@@ -581,8 +742,10 @@
             mainBtn.innerText = lang.pullAgain;
             mainBtn.classList.remove('btn-active-float');
             redrawBtn.style.display = 'none';
-            const msg = lang.successMsgs[currentSuccessMsgIdx];
-            quoteBox.innerText = msg.replace("{name}", selectedMember.name);
+            let msg = lang.successMsgs[currentSuccessMsgIdx];
+            let formattedMsg = msg.replace("{user}", userSpan)
+                                .replace("{name}", selectedMember.name);
+            quoteBox.innerHTML = formattedMsg
         }
     }
 
@@ -596,6 +759,52 @@
         if (state === 'IDLE') pull();
         else if (state === 'DRAWN') startPlay();
         else if (state === 'END') resetGame();
+    }
+
+    function checkName() {
+        const lang = i18n[currentLang];
+        const introElem = document.getElementById('modal-intro');
+        if (introElem) introElem.innerHTML = lang.nameIntro;
+        
+        const promptElem = document.getElementById('modal-prompt');
+        if (promptElem) promptElem.innerText = lang.namePrompt;
+        
+        const btnElem = document.getElementById('modal-btn');
+        if (btnElem) btnElem.innerText = lang.nameBtn;
+
+        if (userName && document.getElementById('name-modal').style.display !== 'flex') {
+            document.getElementById('name-modal').style.display = 'none';
+        }
+    }
+
+    function saveName() {
+        const input = document.getElementById('user-name-input');
+        const val = input.value.trim();
+        if (!val) return;
+        
+        userName = val;
+        localStorage.setItem('cortis_user_name', userName);
+
+        const modal = document.getElementById('name-modal');
+        modal.style.opacity = '0';
+        setTimeout(() => {
+            modal.style.display = 'none';
+            updateUI(); 
+        }, 500);
+    }
+
+    function resetUserName() {
+        const modal = document.getElementById('name-modal');
+        const input = document.getElementById('user-name-input');
+        
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            modal.style.opacity = '1';
+            input.value = userName;
+            input.focus();
+        }, 10);
+
+        checkName(); 
     }
 
     function pull() {
@@ -640,6 +849,7 @@
         }
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        welcomeIdx = Math.floor(Math.random() * i18n[currentLang].welcomeMsgs.length);
         updateUI();
     }
 
@@ -774,7 +984,10 @@
         lastTouchEnd = now;
     }, false);
    
-    window.onload = updateUI;
+    window.onload = () => {
+        checkName(); 
+        updateUI(); 
+    };
 </script>
 </body>
 </html>
