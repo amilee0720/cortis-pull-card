@@ -602,6 +602,9 @@
         selectedMember = members[Math.floor(Math.random() * members.length)];
         selectedImg = selectedMember.imgs[Math.floor(Math.random() * selectedMember.imgs.length)];
 
+        const imgPreload = new Image();
+        imgPreload.src = selectedImg;
+
         currentPullMsgIdx = Math.floor(Math.random() * i18n[currentLang].pullMsgs.length);
 
         document.getElementById('card-name').innerText = selectedMember.name;
