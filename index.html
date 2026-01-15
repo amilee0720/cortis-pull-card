@@ -810,6 +810,12 @@
     function toggleLanguage() {
         currentLang = currentLang === 'zh' ? 'en' : 'zh';
         localStorage.setItem('cortis_lang', currentLang); 
+
+        if (typeof gtag === 'function') {
+            gtag('event', 'language_change', {
+                'to_lang': currentLang
+            });
+        }
         
         const appCont = document.getElementById('app-container');
         if (currentLang === 'zh') { 
@@ -1041,6 +1047,13 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         canvas.classList.remove('active');
         photo.classList.add('success-zoom');
+
+        if (typeof gtag === 'function' && selectedMember) {
+            gtag('event', 'scratch_complete', {
+                'member_name': selectedMember.name
+            });
+        }
+
         const sparkle = document.createElement('div');
         sparkle.className = 'sparkle-overlay';
         document.getElementById('card-window').appendChild(sparkle);
