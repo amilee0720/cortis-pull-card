@@ -891,8 +891,12 @@
         selectedImg = selectedMember.imgs[Math.floor(Math.random() * selectedMember.imgs.length)];
 
         if (typeof gtag === 'function' && selectedMember) {
+            const imgIndex = selectedMember.imgs.indexOf(selectedImg) + 1;
+            const photoId = selectedMember.name + "_#" + imgIndex.toString().padStart(3, '0');
+
             gtag('event', 'card_pull_success', {
-                'member_name': selectedMember.name
+                'member_name': selectedMember.name,
+                'photo_id': photoId 
             });
         }
 
@@ -1049,8 +1053,12 @@
         photo.classList.add('success-zoom');
 
         if (typeof gtag === 'function' && selectedMember) {
+            const imgIndex = selectedMember.imgs.indexOf(selectedImg) + 1;
+            const photoId = selectedMember.name + "_#" + imgIndex.toString().padStart(3, '0');
+
             gtag('event', 'scratch_complete', {
-                'member_name': selectedMember.name
+                'member_name': selectedMember.name,
+                'photo_id': photoId
             });
         }
 
