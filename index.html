@@ -328,6 +328,14 @@
         <button onclick="saveName()" id="modal-btn"></button>
     </div>
 </div>
+<div id="privacy-modal" class="name-modal" style="display: none; opacity: 0; transition: opacity 0.3s ease;">
+    <div class="name-box" style="text-align: center; width: 85%; max-width: 340px; padding: 35px 25px;">
+        <h2 id="privacy-title" style="font-size: 1.1rem; margin-bottom: 15px; font-weight: 900; color: var(--mid-grey); text-align: center;"></h2>
+        <div id="privacy-body" style="font-size: 0.8rem; line-height: 1.6; color: #666; margin-bottom: 25px; text-align: center;">
+        </div>
+        <button onclick="togglePrivacy(false)" id="privacy-close-btn" class="btn-base btn-primary" style="width: 100%; height: 48px; margin: 0 auto;"></button>
+    </div>
+</div>
 <div class="app" id="app-container">
     <header class="header-row">
         <div class="header-side"></div>
@@ -425,7 +433,10 @@
                 "✨ 每一像素都是驚喜，這張 {name} 值得 {user} 永久收藏",
                 "🥰 只要看到 {name}，{user} 的世界就被點亮了！"
             ],
-            copyright: "本網頁為 CORTIS 應援小作品，非官方發行。所有影像資源之版權均屬原經紀公司所有。本網頁僅供娛樂與技術交流使用，嚴禁任何商業行為。<br>© 2026 Your Daily CORTIS! | Original Design & Concept by <a href='https://www.threads.net/@leeami0720' target='_blank' class='footer-link'>@leeami0720</a>"
+            privacyTitle: "【關於數據蒐集聲明】",
+            privacyContent: "為了提供更好的抽卡體驗，本網頁採用 Google Analytics 進行基礎流量統計與去識別化之行為分析。蒐集範圍包含：<br><br>1. 網頁造訪與流量趨勢<br>2. 內容受歡迎程度分析<br><br>以上數據皆為去識別化資料，不會蒐集您的個人隱私資訊，僅供開發者優化網頁體驗與內容參考。",
+            privacyClose: "我知道了",
+            copyright: "<span style='font-size: 0.6rem; text-decoration: underline; font-weight: normal; color: #bbb; cursor: pointer;' onclick='togglePrivacy(true)'>隱私權聲明 Privacy Policy</span><br>本網頁為 CORTIS 應援小作品，非官方發行。所有影像資源之版權均屬原經紀公司所有。本網頁僅供娛樂與技術交流使用，嚴禁任何商業行為。<br>© 2026 Your Daily CORTIS! | Original Design & Concept by <a href='https://www.threads.net/@leeami0720' target='_blank' class='footer-link'>@leeami0720</a>"
         },
         en: {
             title: "Your Daily CORTIS!",
@@ -482,7 +493,9 @@
                 "✨ Every pixel is a surprise! This {name} is a must-keep for {user}",
                 "🥰 Just seeing {name} brightens up your whole world, {user}!"
             ],
-            copyright: "This is a non-official fan-made project for entertainment only. <br>All images belong to their respective agencies. No commercial use intended.<br>© 2026 Your Daily CORTIS! | Original Design & Concept by <a href='https://www.threads.net/@leeami0720' target='_blank' class='footer-link'>@leeami0720</a>"
+            privacyTitle: "Data Collection Statement ",
+            privacyContent: "To provide a better card-pulling experience, this website uses Google Analytics for basic traffic statistics and anonymous behavior analysis. Data collected includes:<br><br>1. Website visits and traffic trends<br>2. Content popularity analysis<br><br>All data is de-identified and does not include your personal information. It is used solely to help the developer improve the website experience and content.",            privacyClose: "Got it",
+            copyright: "<span style='font-size: 0.6rem; text-decoration: underline; font-weight: normal; color: #bbb; cursor: pointer;' onclick='togglePrivacy(true)'>Privacy Policy</span><br>This is a non-official fan-made project for entertainment only. All images belong to their respective agencies.<br>© 2026 Your Daily CORTIS! | Original Design & Concept by <a href='https://www.threads.net/@leeami0720' target='_blank' class='footer-link'>@leeami0720</a>"
         }
     };
 
@@ -742,13 +755,20 @@
         if (introElem) introElem.innerHTML = lang.nameIntro;
 
         const promptElem = document.getElementById('modal-prompt');
-        if(promptElem) promptElem.innerText = lang.namePrompt;
+        if (promptElem) promptElem.innerText = lang.namePrompt;
 
         const btnElem = document.getElementById('modal-btn');
-        if(btnElem) btnElem.innerText = lang.nameBtn;
+        if (btnElem) btnElem.innerText = lang.nameBtn;
 
         const inputElem = document.getElementById('user-name-input');
         if (inputElem) inputElem.placeholder = lang.namePlaceholder;
+
+        const privacyTitle = document.getElementById('privacy-title');
+        const privacyBody = document.getElementById('privacy-body');
+        const privacyCloseBtn = document.getElementById('privacy-close-btn');
+        if (privacyTitle) privacyTitle.innerText = lang.privacyTitle;
+        if (privacyBody) privacyBody.innerHTML = lang.privacyContent;
+        if (privacyCloseBtn) privacyCloseBtn.innerText = lang.privacyClose;
 
         document.getElementById('title-main').innerText = lang.title;
         document.getElementById('copy-text').innerHTML = lang.copyright;
@@ -801,6 +821,19 @@
         }
         
         updateUI();
+    }
+
+    function togglePrivacy(show) {
+        const modal = document.getElementById('privacy-modal');
+        
+        if (show) {
+            updateUI();
+            modal.style.display = 'flex';
+            setTimeout(() => modal.style.opacity = '1', 10);
+        } else {
+            modal.style.opacity = '0';
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
     }
 
     function handleMain() {
