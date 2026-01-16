@@ -12,16 +12,17 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-4WYEJ8WQFL"></script>
     <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-4WYEJ8WQFL');
     </script>
-
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Your Daily CORTIS">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Your Daily CORTIS!</title>
     <style>
@@ -1091,6 +1092,14 @@
     }, false);
    
     window.onload = () => {
+        const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+        const launchMode = isStandalone ? 'Home Screen' : 'Browser';
+
+        if (typeof gtag === 'function') {
+            gtag('event', 'app_launch', {
+                'launch_mode': launchMode
+            });
+        }
         checkName(); 
         updateUI(); 
     };
