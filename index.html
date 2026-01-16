@@ -16,8 +16,8 @@
     <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-4WYEJ8WQFL');
+        gtag('js', new Date());
+        gtag('config', 'G-4WYEJ8WQFL');
     </script>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -509,6 +509,7 @@
     let currentSuccessMsgIdx = 0;
     let userName = localStorage.getItem('cortis_user_name') || "";
     let welcomeIdx = Math.floor(Math.random() * i18n.zh.welcomeMsgs.length); 
+    let currentLaunchMode = 'Browser';
 
     const members = [
         { 
@@ -749,6 +750,17 @@
     const mainBtn = document.getElementById('main-btn'), redrawBtn = document.getElementById('redraw-btn');
     const quoteBox = document.getElementById('quote'), appCont = document.getElementById('app-container');
 
+    function trackLaunchMode() {
+        const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+        currentLaunchMode = isStandalone ? 'Home Screen' : 'Browser';
+
+        if (typeof gtag === 'function') {
+            gtag('event', 'app_launch', {
+                'launch_mode': currentLaunchMode
+            });
+        }
+    }
+
     function updateUI() {
         const lang = i18n[currentLang];
 
@@ -897,7 +909,8 @@
 
             gtag('event', 'card_pull_success', {
                 'member_name': selectedMember.name,
-                'photo_id': photoId 
+                'photo_id': photoId,
+                'launch_mode': currentLaunchMode
             });
         }
 
@@ -1059,7 +1072,8 @@
 
             gtag('event', 'scratch_complete', {
                 'member_name': selectedMember.name,
-                'photo_id': photoId
+                'photo_id': photoId,
+                'launch_mode': currentLaunchMode
             });
         }
 
@@ -1090,19 +1104,18 @@
         }
         lastTouchEnd = now;
     }, false);
-   
-    window.onload = () => {
-        const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-        const launchMode = isStandalone ? 'Home Screen' : 'Browser';
 
-        if (typeof gtag === 'function') {
-            gtag('event', 'app_launch', {
-                'launch_mode': launchMode
-            });
-        }
+    window.onload = () => {
+        trackLaunchMode();
         checkName(); 
         updateUI(); 
     };
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            trackLaunchMode();
+        }
+    });
 </script>
 </body>
 </html>
