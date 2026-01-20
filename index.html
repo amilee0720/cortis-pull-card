@@ -1,36 +1,17 @@
-<!-- 
-*************************************************************************
-*  Your Daily CORTIS!
-*  Original Design & Concept by @leeami0720 (Threads)
-*  
-*  All rights reserved. 
-*  Please do not copy the copywriting and visual logic without permission.
-*************************************************************************
--->
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4WYEJ8WQFL"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-4WYEJ8WQFL');
-    </script>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Your Daily CORTIS">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Your Daily CORTIS!</title>
+    <meta http-equiv="refresh" content="5;url=https://cortis-cards.vercel.app/">
+    <title>搬家通知 | Relocation Notice - Your Daily CORTIS!</title>
     <style>
         :root {
             --bg: #ffffff;
             --grey: #333333;
             --mid-grey: #494848;
-            --switch-bg: #f0f0f0;
+            --light-grey: #f9f9f9;
+            --border: #eeeeee;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -41,1081 +22,178 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             position: fixed; 
             touch-action: none;
-            -webkit-text-size-adjust: 100%;
         }
 
         .app { 
             display: flex; flex-direction: column; width: 100%; max-width: 500px; 
             height: 100dvh; margin: 0 auto;
-            padding: env(safe-area-inset-top) 15px env(safe-area-inset-bottom);
+            padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
+            justify-content: center;
+            align-items: center;
         }
 
-        header.header-row {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 5px 5px 0px; flex-shrink: 0; height: 45px;
+        header {
+            position: absolute;
+            top: env(safe-area-inset-top);
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
         }
-
-        .header-side { flex: 1; display: flex; align-items: center; }
-        .header-side.right { justify-content: flex-end; }
 
         header h1 { 
-            flex: 2; margin: 0; font-size: clamp(1.1rem, 5vw, 1.4rem); 
-            font-weight: 900; text-align: center; color: var(--mid-grey);
-            white-space: nowrap; letter-spacing: -0.5px;
+            margin: 0; font-size: clamp(1.1rem, 5vw, 1.3rem); 
+            font-weight: 900; color: #bbb; /* 品牌名稍微淡化，凸顯下方的公告 */
+            letter-spacing: -0.5px;
         }
 
-        .lang-switch-pill {
-            position: fixed;
-            top: 12px; 
-            right: 15px;
-            z-index: 4000;
-            width: 58px; 
-            height: 28px; 
-            background: var(--switch-bg);
-            border-radius: 14px; 
-            display: flex;
-            align-items: center; 
-            cursor: pointer; 
-            padding: 2px;
-            border: 1px solid #e5e5e5; 
-            user-select: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .lang-switch-pill span {
-            flex: 1; font-size: 0.65rem; font-weight: 800; z-index: 2;
-            color: #aaa; transition: color 0.3s; text-align: center;
-        }
-
-        .pill-thumb {
-            position: absolute; width: 28px; height: 22px;
-            background: #fff; border-radius: 12px; left: 2px;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); z-index: 1;
-        }
-
-        .app.lang-zh .pill-thumb { transform: translateX(0px); }
-        .app.lang-zh #label-zh { color: var(--mid-grey); }
-        .app.lang-zh #label-en { color: #aaa; }
-        .app.lang-en .pill-thumb { transform: translateX(24px); }
-        .app.lang-en #label-en { color: var(--mid-grey); }
-        .app.lang-en #label-zh { color: #aaa; }
-
-        #quote { 
-            font-size: 0.85rem; 
-            color: #747373; 
-            margin-top: 5px;
-            font-weight: 600; 
-            line-height: 1.4;
-            min-height: 3em;
-            display: block;
-            text-align: center;
-            padding: 0 20px; 
-            flex-shrink: 0;
-        }
-
-        main {
-            flex: 1; display: flex; align-items: center; justify-content: center;
-            position: relative; width: 100%; min-height: 0;
-        }
-
-        .window {
-            position: relative; height: 95%; max-height: 420px;
-            aspect-ratio: 2 / 3; background: #fff;
-            border-radius: 15px; border: 1px solid #eee;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden;
-        }
-
-        #photo { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 1; }
-        .success-zoom { transform: scale(1.1) !important; transition: transform 1s ease; }
-
-        #canvas { 
-            position: absolute; inset: 0; z-index: 50; 
-            cursor: crosshair; touch-action: none; 
-            opacity: 0; pointer-events: none;
-        }
-        #canvas.active { opacity: 1; pointer-events: auto; }
-
-        #overlay {
-            position: absolute; inset: 0; z-index: 100;
-            background: rgba(255, 255, 255, 0.98);
-            display: flex; align-items: center; justify-content: center;
-            perspective: 1000px; transition: opacity 0.4s ease;
-        }
-
-        .card { width: 160px; height: 240px; position: relative; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
-        .card.flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 12px; border: 1.5px solid var(--mid-grey); display: flex; align-items: center; justify-content: center; }
-        .card-back { background: var(--mid-grey); color: #fff; font-weight: bold; letter-spacing: 2px; font-size: 0.9rem; }
-        .card-front { background: #fff; color: var(--mid-grey); transform: rotateY(180deg); font-weight: 700; text-transform: uppercase; font-size: 0.9rem; }
-
-        .sparkle-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; overflow: hidden; }
-        .sparkle-overlay::after {
-            content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(45deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 70%);
-            transform: rotate(30deg); animation: shine-sweep 3s ease-in-out infinite;
-        }
-        @keyframes shine-sweep { 0% { transform: translate(-100%, -100%) rotate(30deg); } 100% { transform: translate(100%, 100%) rotate(30deg); } }
-
-        footer { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; padding: 10px 0 15px; }
-        .btn-group { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; min-height: 110px; }
-        .btn-base { width: 80%; max-width: 220px; height: 48px; border-radius: 50px; font-weight: 800; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; border: none; }
-        .btn-primary { background: var(--mid-grey); color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .btn-secondary { background: #fff; color: var(--mid-grey); border: 2px solid var(--mid-grey); }
-        .hidden-all { opacity: 0 !important; pointer-events: none !important; }
-        @keyframes breathing-float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-5px); background-color: #555; } }
-        .btn-active-float { animation: breathing-float 2s ease-in-out infinite; }
-
-        .copyright { margin-top: 10px; font-size: 0.55rem; color: #bbb; text-align: center; line-height: 1.4; padding: 0 20px; }
-        .footer-link { color: #aaa; text-decoration: underline; }
-
-        @media (max-height: 600px) {
-            header.header-row { height: 40px; }
-            header h1 { font-size: 1rem; }
-            .window { max-height: 280px; }
-        }
-
-        .scratch-hint {
-            position: absolute;
-            top: 50%;
-            left: 0; 
+        .notice-card {
             width: 100%;
-            transform: translateY(-50%);
-            z-index: 60;
-            pointer-events: none;
-            display: none;
-            opacity: 0;
+            background: #fff;
+            padding: 0;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+            border: 1.5px solid var(--border);
             text-align: center;
-            transition: opacity 0.5s;
+            overflow: hidden;
         }
 
-        @keyframes hint-pulse {
-            0%, 100% { 
-                opacity: 0.3; 
-                transform: translateY(-50%) scale(1); 
-            }
-            50% { 
-                opacity: 0.7; 
-                transform: translateY(-50%) scale(1.08); 
-            }
+        /* 標題區域：改為深色背景，極高對比 */
+        .notice-header {
+            background: var(--mid-grey);
+            padding: 30px 20px;
+            color: #ffffff;
         }
 
-        .scratch-hint.active {
-            display: block;
-            animation: hint-pulse 2.5s infinite ease-in-out;
-        }
-
-        #hint-text-content {
-            color: var(--mid-grey);
-            font-weight: 700;
-            font-size: 0.6rem;
+        .notice-title-zh {
+            font-weight: 900;
+            font-size: 1.4rem; /* 加大中文標題 */
             letter-spacing: 2px;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-            white-space: nowrap;
-            display: inline-block;
-        }
-
-        .name-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.95);
-            z-index: 3000;
+            margin-bottom: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            gap: 10px;
         }
 
-        .name-box {
-            width: 85%;
-            max-width: 340px;
-            text-align: center;
-            background: #fff;
-            padding: 35px 25px;
-            border-radius: 30px;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.12);
-        }
-
-        .name-box h2 {
-            margin: 0 0 10px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            color: var(--mid-grey);
-        }
-
-        .name-box p {
-            font-size: 0.9rem;
-            color: #777;
-            margin-bottom: 20px;
+        .notice-title-en {
             font-weight: 600;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        .modal-intro {
-            font-size: 0.85rem;
-            color: #888;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        .modal-prompt {
-            font-size: 0.85rem;
+        .notice-body {
+            padding: 35px 25px;
+            font-size: 0.95rem;
+            line-height: 1.8;
             color: var(--mid-grey);
-            margin-bottom: 20px;
-            font-weight: 800;
+            font-weight: 700;
         }
 
-        #user-name-input {
-            background: #f9f9f9;
-            border: 2px solid #eee;
-            width: 100%;
-            padding: 12px 20px;
-            border-radius: 50px;
-            border: 2px solid #eee;
-            font-size: 0.8rem;
-            text-align: center;
-            outline: none;
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
+        .lang-sep {
+            margin: 20px auto;
+            width: 50px;
+            border-top: 2px solid var(--border);
         }
 
-        #user-name-input:focus {
-            border-color: var(--mid-grey);
-        }
-
-        #user-name-input::placeholder {
-            color: #a7a7a7;
-            opacity: 1;
+        .en-text {
+            font-weight: 500;
+            color: #777;
             font-size: 0.85rem;
         }
 
-        #modal-btn {
+        .btn-container {
+            padding: 0 25px 40px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
             width: 100%;
-            height: 50px;
+            max-width: 250px;
+            height: 55px;
             background: var(--mid-grey);
             color: #fff;
-            border: none;
+            text-decoration: none;
             border-radius: 50px;
             font-weight: 800;
-            font-size: 0.85rem;
-            cursor: pointer;
+            font-size: 0.9rem;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .user-clickable {
-            color: var(--mid-grey);
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            cursor: pointer;
-            font-weight: 900;
-            transition: opacity 0.2s;
-            display: inline;
+        .btn-primary:active {
+            transform: scale(0.95);
+            background-color: #000;
         }
 
-        .user-clickable:hover {
-            opacity: 0.6;
+        footer {
+            position: absolute;
+            bottom: env(safe-area-inset-bottom);
+            width: 100%;
+            padding: 20px;
+            text-align: center;
         }
 
+        .copyright {
+            font-size: 0.6rem;
+            color: #bbb;
+            line-height: 1.5;
+            font-weight: 500;
+            max-width: 340px;
+            margin: 0 auto;
+        }
+
+        @media (max-height: 650px) {
+            .notice-header { padding: 20px; }
+            .notice-title-zh { font-size: 1.2rem; }
+            .notice-body { padding: 25px; font-size: 0.85rem; }
+            .btn-container { padding-bottom: 30px; }
+            .btn-primary { height: 48px; }
+        }
     </style>
 </head>
-<body class="lang-zh">
-<div id="name-modal" class="name-modal">
-    <div class="name-box">
+<body>
 
-        <p id="modal-intro" class="modal-intro"></p> 
-        <p id="modal-prompt" class="modal-prompt"></p>
-        
-        <input type="text" id="user-name-input" placeholder="" maxlength="10">
-        <button onclick="saveName()" id="modal-btn"></button>
-    </div>
-</div>
-<div id="privacy-modal" class="name-modal" style="display: none; opacity: 0; transition: opacity 0.3s ease;">
-    <div class="name-box" style="text-align: center; width: 85%; max-width: 340px; padding: 35px 25px;">
-        <h2 id="privacy-title" style="font-size: 1.1rem; margin-bottom: 15px; font-weight: 900; color: var(--mid-grey); text-align: center;"></h2>
-        <div id="privacy-body" style="font-size: 0.8rem; line-height: 1.6; color: #666; margin-bottom: 25px; text-align: center;">
-        </div>
-        <button onclick="togglePrivacy(false)" id="privacy-close-btn" class="btn-base btn-primary" style="width: 100%; height: 48px; margin: 0 auto;"></button>
-    </div>
-</div>
-<div class="app" id="app-container">
-    <header class="header-row">
-        <div class="header-side"></div>
-        <h1 id="title-main">Your Daily CORTIS!</h1>
-        <div class="header-side right">
-            <div class="lang-switch-pill" onclick="toggleLanguage()">
-                <span id="label-zh">中</span>
-                <span id="label-en">EN</span>
-                <div class="pill-thumb"></div>
-            </div>
-        </div>
+<div class="app">
+    <header>
+        <h1>Your Daily CORTIS!</h1>
     </header>
-    
-    <div id="quote"></div>
+    <main class="notice-card">
+        <div class="notice-header">
+            <div class="notice-title-zh">搬家通知</div>
+            <div class="notice-title-en">Relocation Notice</div>
+        </div>
+        
+        <div class="notice-body">
+            <div>
+                Your Daily CORTIS!已遷移至更穩定的新伺服器。<br>
+                5秒後將自動跳轉，或點擊下方連結：
+            </div>
+            
+            <div class="lang-sep"></div>
 
-    <main>
-        <div class="window" id="card-window">
-            <div id="photo"></div>
-            <canvas id="canvas"></canvas>
-            <div id="scratch-hint" class="scratch-hint">
-                <span id="hint-text-content"></span>
+            <div class="en-text">
+                Your Daily CORTIS! has moved to a more stable server.<br>
+                Redirecting in 5s, or click the button below:
             </div>
-            <div id="overlay">
-                <div id="card-obj" class="card">
-                    <div class="card-face card-back">CORTIS</div>
-                    <div id="card-name" class="card-face card-front">?</div>
-                </div>
-            </div>
+        </div>
+
+        <div class="btn-container">
+            <a href="https://cortis-cards.vercel.app/" class="btn-primary">Go To New Site / 前往新網頁</a>
         </div>
     </main>
 
-    <footer id="ui-footer">
-        <div class="btn-group" id="btn-group">
-            <button id="main-btn" class="btn-base btn-primary" onclick="handleMain()">抽取小卡</button>
-            <button id="redraw-btn" class="btn-base btn-secondary" style="display: none;" onclick="handleRedraw()">重新抽取</button>
+    <footer>
+        <div class="copyright">
+            本網頁保留所有權利，嚴禁任何形式之改編與二次發布。<br>
+            © 2026 Your Daily CORTIS! | Original Design & Concept by @leeami0720<br>
+            All Rights Reserved.
         </div>
-        <div id="copy-text" class="copyright"></div>
     </footer>
 </div>
 
-<script>
-    const i18n = {
-        zh: {
-            title: "Your Daily CORTIS!",
-            pullBtn: "抽取小卡", breakBtn: "揭開真面目", redrawBtn: "不是本命？再抽一次",
-            pullAgain: "再抽一次", shuffling: "重新洗牌中...",
-            scratchHint: " (刮開看照片）",
-            nameIntro: "Hi, COER! <br>動動手指，來開一張今天的驚喜小卡吧！✨",
-            namePrompt: "在開始之前，該怎麼稱呼你呢？",
-            namePlaceholder: "輸入暱稱...",
-            nameBtn: "確定",
-            welcomeMsgs: [
-                "嗨 {user} ！今天想遇見哪位團員呢？✨",
-                "{user} ，今天的手氣如何？抽張小卡試試看吧！🔮",
-                "準備好接收今日份的 CORTIS 能量了嗎， {user}？💪",
-                "{user} ，來抽一張專屬於你今天的本命小卡吧！💖",
-                "每一張小卡都是一份驚喜， {user} 快來揭曉吧！🎁",
-                "{user} ，誰是今天的顏值擔當？動動手指就知道！📸",
-                "心跳加速中... {user} 感覺今天會抽到大驚喜喔！⚡️",
-                "聽到了嗎？是來自 CORTIS 給 {user} 的心動邀請 ✨",
-                "{user} ，用一張最帥氣的小卡，開啟你的美好心情吧 🌈",
-                "{user} ，這裡有一張你的專屬小卡尚未領取喔 💌"
-            ],
-            pullMsgs: [
-                "OMG! 是 {name}！",
-                "準備好了嗎？{name} 正在等你。",
-                "今天的幸運星是 {name}！",
-                "這絕對是命定的一抽：是 {name}！",
-                "{name} 已就緒，正等待與你相遇 ✨",
-                "打破框架，看見最真實的 {name}。",
-                "快看！{name} 正躲在迷霧後對你微笑。",
-                "噓... {name} 的秘密驚喜即將揭曉。",
-                "聽到了嗎？是來自 {name} 的召喚 💖",
-                "心跳加速... 隱約看見 {name} 的身影了！",
-                "全世界最棒的 {name} 即將降臨！",
-                "感覺到了嗎？這張 {name} 正在散發光芒。",
-                "指尖的溫度，即將喚醒沉睡的 {name}。",
-                "準備好迎接驚喜了嗎？是超級驚喜的 {name}！",
-                "這是專屬於你與 {name} 的互動時刻 🎬"
-            ],
-            successMsgs: [
-                "✨ {user}，捕捉到最閃耀的 {name} 了！",
-                "💖 {user}，這是屬於你的限定 {name}！",
-                "🌟 完美的瞬間！{user} 遇見了正在發光的 {name}",
-                "🎬 收藏成功！{user} 把 {name} 帶入庫了",
-                "💎 恭喜 {user}！你抽到了這張傳說級的 {name}！",
-                "🦄 夢幻聯動！{name} 來到 {user} 身邊了",
-                "🌈 運氣爆棚！{user} 竟然遇到了這張 {name}",
-                "📸 {user} 快截圖！這張 {name} 的眼神太犯規了",
-                "🔥 全場焦點！{user} 被 {name} 的氣場震撼到了嗎？",
-                "🧸 恭喜 {user} 解鎖！把這份最特別的 {name} 帶走吧",
-                "🎨 {user} 看，這張充滿氛圍感的 {name} 展現了獨特魅力",
-                "⚡️ 暴擊心動！{user} 被 {name} 的美貌擊中了嗎？",
-                "🕊️ 治癒系神顏，讓 {name} 陪 {user} 度過今天",
-                "✨ 每一像素都是驚喜，這張 {name} 值得 {user} 永久收藏",
-                "🥰 只要看到 {name}，{user} 的世界就被點亮了！"
-            ],
-            privacyTitle: "【關於數據蒐集聲明】",
-            privacyContent: "為了提供更好的抽卡體驗，本網頁採用 Google Analytics 進行基礎流量統計與去識別化之行為分析。蒐集範圍包含：<br><br>1. 網頁造訪與流量趨勢<br>2. 內容受歡迎程度分析<br><br>以上數據皆為去識別化資料，不會蒐集您的個人隱私資訊，僅供開發者優化網頁體驗與內容參考。",
-            privacyClose: "我知道了",
-            copyright: "<span style='font-size: 0.6rem; text-decoration: underline; font-weight: normal; color: #bbb; cursor: pointer;' onclick='togglePrivacy(true)'>隱私權聲明 Privacy Policy</span><br>本網頁為 CORTIS 應援小作品，非官方發行。所有影像資源之版權均屬原經紀公司所有。本網頁僅供娛樂與技術交流使用，嚴禁任何商業行為。<br>© 2026 Your Daily CORTIS! | Original Design & Concept by <a href='https://www.threads.net/@leeami0720' target='_blank' class='footer-link'>@leeami0720</a>"
-        },
-        en: {
-            title: "Your Daily CORTIS!",
-            pullBtn: "Pull Card", breakBtn: "Check the look!", redrawBtn: "Not your bias? Re-pull",
-            pullAgain: "Pull Again", shuffling: "Shuffling...",
-            scratchHint: "(Scratch To See)", 
-            nameIntro: "Hi, COER! <br>Ready for your daily surprise? Swipe to open your card! ✨",
-            namePrompt: "Before we start, what is your name?",
-            namePlaceholder: "Enter nickname...",
-            nameBtn: "Let's Go",
-            welcomeMsgs: [
-                "Hi {user}! Which member do you want to meet today? ✨",
-                "How's your luck today, {user}? Pull a card to find out! 🔮",
-                "Ready for your daily dose of CORTIS energy, {user}? 💪",
-                "{user}, let's pull a special bias card just for you! 💖",
-                "Every card is a surprise. {user}, come and unveil yours! 🎁",
-                "{user}, ready for today's Visual King? Tap to find out! 📸",
-                "Heart racing, {user}... It feels like a big surprise is coming! ⚡️",
-                "Can you hear it, {user}? A heart-fluttering call from CORTIS ✨",
-                "{user}, start your day with the most handsome card! 🌈",
-                "{user}, you have an exclusive card waiting to be claimed 💌"
-            ],
-            pullMsgs: [
-                "OMG! It's {name}!",
-                "Ready? {name} is waiting for you.",
-                "{name} is your lucky star today!",
-                "It's destiny: you've pulled {name}!",
-                "{name} is ready and waiting to meet you ✨",
-                "Break the lines to see the real {name}.",
-                "Look! {name} is smiling from behind the mist.",
-                "Shh... {name}'s secret surprise is about to be revealed.",
-                "Can you hear it? It's a call from {name} 💖",
-                "Heart racing... I can see {name}'s silhouette!",
-                "The world's best {name} is arriving!",
-                "Can you feel it? This {name} card is glowing.",
-                "Your touch is about to wake up the sleeping {name}.",
-                "Ready for a surprise? It's the amazing {name}!",
-                "A special moment just for you and {name} 🎬"
-            ],
-            successMsgs: [
-                "✨ {user}, you've caught the brightest {name}!",
-                "💖 {user}, this is your limited edition {name}!",
-                "🌟 A perfect moment! {user} just met the glowing {name}",
-                "🎬 Successfully collected! {user} has added {name} to the vault",
-                "💎 Congrats {user}! You pulled this legendary {name}!",
-                "🦄 Dreamy encounter! {name} is right by your side, {user}",
-                "🌈 Peak luck! {user}, you actually found this {name}!",
-                "📸 Screenshot time, {user}! {name}'s gaze is just too much",
-                "🔥 Spotlight on! {user}, stunned by {name}'s aura?",
-                "🧸 Congrats on unlocking, {user}! Take this special {name} with you",
-                "🎨 Check it out, {user}! This atmospheric shot of {name} radiates such unique charm",
-                "⚡️ Visual attack! {user}, are you hit by {name}'s stunning visuals?",
-                "🕊️ Healing visuals! Let {name} brighten your day, {user}",
-                "✨ Every pixel is a surprise! This {name} is a must-keep for {user}",
-                "🥰 Just seeing {name} brightens up your whole world, {user}!"
-            ],
-            privacyTitle: "Data Collection Statement ",
-            privacyContent: "To provide a better card-pulling experience, this website uses Google Analytics for basic traffic statistics and anonymous behavior analysis. Data collected includes:<br><br>1. Website visits and traffic trends<br>2. Content popularity analysis<br><br>All data is de-identified and does not include your personal information. It is used solely to help the developer improve the website experience and content.",            privacyClose: "Got it",
-            copyright: "<span style='font-size: 0.6rem; text-decoration: underline; font-weight: normal; color: #bbb; cursor: pointer;' onclick='togglePrivacy(true)'>Privacy Policy</span><br>This is a non-official fan-made project for entertainment only. All images belong to their respective agencies.<br>© 2026 Your Daily CORTIS! | Original Design & Concept by <a href='https://www.threads.net/@leeami0720' target='_blank' class='footer-link'>@leeami0720</a>"
-        }
-    };
-
-    let currentLang = localStorage.getItem('cortis_lang') || 'zh';
-    let state = 'IDLE';
-    let selectedMember = null;
-    let selectedImg = null;
-    let progressTimer = null;
-    let currentPullMsgIdx = 0;
-    let currentSuccessMsgIdx = 0;
-    let userName = localStorage.getItem('cortis_user_name') || "";
-    let welcomeIdx = Math.floor(Math.random() * i18n.zh.welcomeMsgs.length); 
-    let currentLaunchMode = 'Browser';
-
-    const members = [
-        { 
-            name: 'MARTIN', 
-            imgs: [
-                'https://i.meee.com.tw/MOYXYYH.jpg', //001
-                'https://i.meee.com.tw/SEXIiU3.jpg', //002
-                'https://i.meee.com.tw/zFRjemR.jpg', //003
-                'https://i.meee.com.tw/nybbReK.jpg', //004
-                'https://i.meee.com.tw/BFcRZlJ.jpg', //005
-                'https://i.meee.com.tw/Pc2u4J8.jpg', //006
-                'https://i.meee.com.tw/RnUITpD.jpg', //007
-                'https://i.meee.com.tw/Zb8FRRs.jpg', //008
-                'https://i.meee.com.tw/ZgqWbdW.jpg', //009
-                'https://i.meee.com.tw/JPuCVMj.jpg', //010
-                'https://i.meee.com.tw/cGxbgRL.jpg', //011
-                'https://i.meee.com.tw/WZ9HKOt.jpg', //012
-                'https://i.meee.com.tw/EAhkLPa.jpg', //013
-                'https://i.meee.com.tw/CHRCiwv.jpg', //014
-                'https://i.meee.com.tw/K4acoX3.jpg', //015
-                'https://i.meee.com.tw/AgqCwUG.jpg', //016
-                'https://i.meee.com.tw/IBiP9Xm.jpg', //017
-                'https://i.meee.com.tw/0pdENOw.jpg', //018
-                'https://i.meee.com.tw/wu2sbnG.jpg', //019
-                'https://i.meee.com.tw/fPwFyVD.jpg', //020
-                'https://i.meee.com.tw/VcFbdLs.jpg', //021
-                'https://i.meee.com.tw/qCtj1y3.jpg', //022
-                'https://i.meee.com.tw/IP97a5i.jpg', //023
-                'https://i.meee.com.tw/0gKJbSE.jpg', //024
-                'https://i.meee.com.tw/LHFUSDc.jpg', //025
-                'https://i.meee.com.tw/9udlrZt.jpg', //026
-                'https://i.meee.com.tw/63a3eGG.jpg', //027
-                'https://i.meee.com.tw/QLI0KOO.jpg', //028
-                'https://i.meee.com.tw/FBfCScg.jpg', //029
-                'https://i.meee.com.tw/HKrjhy2.jpg', //030
-                'https://i.meee.com.tw/nBHIUqX.jpg', //031
-                'https://i.meee.com.tw/vGQkP0l.jpg', //032
-                'https://i.meee.com.tw/npm2G9Y.jpg', //033
-                'https://i.meee.com.tw/3pEHph6.jpg', //034
-                'https://i.meee.com.tw/wbFC98x.jpg', //035
-                'https://i.meee.com.tw/s7uRU3X.jpg', //036
-                'https://i.meee.com.tw/GpmAtDL.jpg', //037
-                'https://i.meee.com.tw/lb7RCBk.jpg', //038
-                'https://i.meee.com.tw/BqGhZtG.jpg', //039
-                'https://i.meee.com.tw/OiaypWz.jpg', //040
-                'https://i.meee.com.tw/IBE84U7.jpg'  //041
-            ] 
-        },
-        { 
-            name: 'JAMES', 
-            imgs: [
-                'https://i.meee.com.tw/CVBsBfd.jpg', //001
-                'https://i.meee.com.tw/xtAhmPX.jpg', //002
-                'https://i.meee.com.tw/3G5NxcV.jpg', //003
-                'https://i.meee.com.tw/kA8DG3b.jpg', //004
-                'https://i.meee.com.tw/VMDbJX7.jpg', //005
-                'https://i.meee.com.tw/agwNTow.jpg', //006
-                'https://i.meee.com.tw/Ipfv0L5.jpg', //007
-                'https://i.meee.com.tw/08xbMYK.jpg', //008
-                'https://i.meee.com.tw/BMFBEF9.jpg', //009
-                'https://i.meee.com.tw/443BjvM.jpg', //010
-                'https://i.meee.com.tw/NyCrZFY.jpg', //011
-                'https://i.meee.com.tw/nqHzylv.jpg', //012
-                'https://i.meee.com.tw/HdAbga0.jpg', //013
-                'https://i.meee.com.tw/tQ3LFv8.jpg', //014
-                'https://i.meee.com.tw/Pgf02by.jpg', //015
-                'https://i.meee.com.tw/tUHP9eq.jpg', //016
-                'https://i.meee.com.tw/cFAFXHL.jpg', //017
-                'https://i.meee.com.tw/iw81cbd.jpg', //018
-                'https://i.meee.com.tw/ovceTuk.jpg', //019
-                'https://i.meee.com.tw/7wCu2Ne.jpg', //020
-                'https://i.meee.com.tw/b9zN4u7.jpg', //021
-                'https://i.meee.com.tw/GatiyNi.jpg', //022
-                'https://i.meee.com.tw/09mgKIc.jpg', //023
-                'https://i.meee.com.tw/OhvD8d6.jpg', //024
-                'https://i.meee.com.tw/xmxsUOU.jpg', //025
-                'https://i.meee.com.tw/I9kGYfx.jpg', //026
-                'https://i.meee.com.tw/qOU6Jq5.jpg', //027
-                'https://i.meee.com.tw/WA6Owsw.jpg', //028
-                'https://i.meee.com.tw/i9oRArI.jpg', //029
-                'https://i.meee.com.tw/jPwvfEK.jpg', //030
-                'https://i.meee.com.tw/uWJs9sT.jpg', //031
-                'https://i.meee.com.tw/N3DAwqP.jpg', //032
-                'https://i.meee.com.tw/Ak8oEDk.jpg', //033
-                'https://i.meee.com.tw/N3J3tmF.jpg', //034
-                'https://i.meee.com.tw/Zni4ahH.jpg', //035
-                'https://i.meee.com.tw/OzvQZvK.jpg', //036
-                'https://i.meee.com.tw/oAhHC9H.jpg', //037
-                'https://i.meee.com.tw/YPibdR6.jpg', //038
-                'https://i.meee.com.tw/GGAf8Wh.jpg', //039
-                'https://i.meee.com.tw/AaNm91y.jpg', //040
-                'https://i.meee.com.tw/vnOtoNj.jpg'  //041
-            ] 
-        },
-        { 
-            name: 'JUHOON', 
-            imgs: [
-                'https://i.meee.com.tw/NcdYMX7.jpg', //001
-                'https://i.meee.com.tw/J9lZu2w.jpg', //002
-                'https://i.meee.com.tw/2urGipe.jpg', //003
-                'https://i.meee.com.tw/Etfw5vh.jpg', //004
-                'https://i.meee.com.tw/XPZy2Ax.jpg', //005
-                'https://i.meee.com.tw/idAqO9Z.jpg', //006
-                'https://i.meee.com.tw/jG1kN6o.jpg', //007
-                'https://i.meee.com.tw/6k15xnq.jpg', //008
-                'https://i.meee.com.tw/ZuWz8u9.jpg', //009
-                'https://i.meee.com.tw/NiWzAif.jpg', //010
-                'https://i.meee.com.tw/XfHBS3X.jpg', //011
-                'https://i.meee.com.tw/QLDYDN5.jpg', //012
-                'https://i.meee.com.tw/RdO84FD.jpg', //013
-                'https://i.meee.com.tw/iYWyYIV.jpg', //014
-                'https://i.meee.com.tw/LyHeJwT.jpg', //015
-                'https://i.meee.com.tw/6Iu0lc0.jpg', //016
-                'https://i.meee.com.tw/cOiAmF3.jpg', //017
-                'https://i.meee.com.tw/CPNWL6a.jpg', //018
-                'https://i.meee.com.tw/F8KcTfr.jpg', //019
-                'https://i.meee.com.tw/thhW0yr.jpg', //020
-                'https://i.meee.com.tw/V7Fw2Fx.jpg', //021
-                'https://i.meee.com.tw/2RUrC2b.jpg', //022
-                'https://i.meee.com.tw/RtZyWdr.jpg', //023
-                'https://i.meee.com.tw/FpqvDsF.jpg', //024
-                'https://i.meee.com.tw/rcvG6eh.jpg', //025
-                'https://i.meee.com.tw/VkCgEja.jpg', //026
-                'https://i.meee.com.tw/7xURHqc.jpg', //027
-                'https://i.meee.com.tw/lGZ6xBQ.jpg', //028
-                'https://i.meee.com.tw/kqPD6I4.jpg', //029
-                'https://i.meee.com.tw/26CRqzz.jpg', //030
-                'https://i.meee.com.tw/hrxaA4d.jpg', //031
-                'https://i.meee.com.tw/GJcXP2N.jpg', //032
-                'https://i.meee.com.tw/ZbPgm5R.jpg', //033
-                'https://i.meee.com.tw/62oX3v0.jpg', //034
-                'https://i.meee.com.tw/Mqfwqov.jpg', //035
-                'https://i.meee.com.tw/T9M6c8T.jpg', //036
-                'https://i.meee.com.tw/QTcLlEG.jpg', //037
-                'https://i.meee.com.tw/L0hUH8u.jpg', //038
-                'https://i.meee.com.tw/9qdsKFy.jpg', //039
-                'https://i.meee.com.tw/1Dn8QUo.jpg', //040
-                'https://i.meee.com.tw/PYgaVcq.jpg'  //041
-
-            ] 
-        },
-        { 
-            name: 'SEONGHYEON', 
-            imgs: [
-                'https://i.meee.com.tw/BIumaWw.jpg', //001
-                'https://i.meee.com.tw/1EVXMKA.jpg', //002
-                'https://i.meee.com.tw/ovZEBqB.jpg', //003
-                'https://i.meee.com.tw/stTT15O.jpg', //004
-                'https://i.meee.com.tw/4BkHrGv.jpg', //005
-                'https://i.meee.com.tw/IttS1Qk.jpg', //006
-                'https://i.meee.com.tw/zEEp4hj.jpg', //007
-                'https://i.meee.com.tw/Wmvt06M.jpg', //008
-                'https://i.meee.com.tw/HC1zIaI.jpg', //009
-                'https://i.meee.com.tw/48UcC4j.jpg', //010
-                'https://i.meee.com.tw/7bjuACv.jpg', //011
-                'https://i.meee.com.tw/4SA8Zfn.jpg', //012
-                'https://i.meee.com.tw/50ugDvH.jpg', //013
-                'https://i.meee.com.tw/R3gWDCJ.jpg', //014
-                'https://i.meee.com.tw/OxAENiY.jpg', //015
-                'https://i.meee.com.tw/PncXEQb.jpg', //016
-                'https://i.meee.com.tw/dFGOhkJ.jpg', //017
-                'https://i.meee.com.tw/wJ0yrIp.jpg', //018
-                'https://i.meee.com.tw/pvDLmWS.jpg', //019
-                'https://i.meee.com.tw/cBpEnL7.jpg', //020
-                'https://i.meee.com.tw/iGx6FU4.jpg', //021
-                'https://i.meee.com.tw/uVaK1ZC.jpg', //022
-                'https://i.meee.com.tw/Coe2Xji.jpg', //023
-                'https://i.meee.com.tw/rmLojta.jpg', //024
-                'https://i.meee.com.tw/fUyJ5uZ.jpg', //025
-                'https://i.meee.com.tw/pTTflJj.jpg', //026
-                'https://i.meee.com.tw/G9VS9NE.jpg', //027
-                'https://i.meee.com.tw/7RTGCmf.jpg', //028
-                'https://i.meee.com.tw/EgTENpf.jpg', //029
-                'https://i.meee.com.tw/ocU7do0.jpg', //030
-                'https://i.meee.com.tw/XdMepIA.jpg', //031
-                'https://i.meee.com.tw/MMlSVTC.jpg', //032
-                'https://i.meee.com.tw/4diqcVU.jpg', //033
-                'https://i.meee.com.tw/LobjZF4.jpg', //034
-                'https://i.meee.com.tw/E7m4FCB.jpg', //035
-                'https://i.meee.com.tw/l9T7qtd.jpg', //036
-                'https://i.meee.com.tw/DMGbGxW.jpg', //037
-                'https://i.meee.com.tw/zzR5FSh.jpg', //038
-                'https://i.meee.com.tw/bPUxjlO.jpg', //039
-                'https://i.meee.com.tw/DDetHVG.jpg', //040
-                'https://i.meee.com.tw/Lqddbrl.jpg'  //041
-            ] 
-        },
-        { 
-            name: 'KEONHO', 
-            imgs: [
-                'https://i.meee.com.tw/RifsdWi.jpg', //001
-                'https://i.meee.com.tw/h6sBuPV.jpg', //002
-                'https://i.meee.com.tw/orrhHJ9.jpg', //003
-                'https://i.meee.com.tw/ulzgelY.jpg', //004
-                'https://i.meee.com.tw/hrasay4.jpg', //005
-                'https://i.meee.com.tw/KdBrKDx.jpg', //006
-                'https://i.meee.com.tw/us2KGpy.jpg', //007
-                'https://i.meee.com.tw/UwUBIUD.jpg', //008
-                'https://i.meee.com.tw/gF9niFB.jpg', //009
-                'https://i.meee.com.tw/CRHCpB1.jpg', //010
-                'https://i.meee.com.tw/BdkFp7E.jpg', //011
-                'https://i.meee.com.tw/EpSMghF.jpg', //012
-                'https://i.meee.com.tw/IiOHTxO.jpg', //013
-                'https://i.meee.com.tw/FKtO9gB.jpg', //014
-                'https://i.meee.com.tw/uvavWIW.jpg', //015
-                'https://i.meee.com.tw/ey4XbGj.jpg', //016
-                'https://i.meee.com.tw/yFoEH6Y.jpg', //017
-                'https://i.meee.com.tw/cyAyduB.jpg', //018
-                'https://i.meee.com.tw/pzm48tI.jpg', //019
-                'https://i.meee.com.tw/qGoDBGL.jpg', //020
-                'https://i.meee.com.tw/OvezIXK.jpg', //021
-                'https://i.meee.com.tw/lc2cvnR.jpg', //022
-                'https://i.meee.com.tw/6EIUcNn.jpg', //023
-                'https://i.meee.com.tw/EM9l1yO.jpg', //024
-                'https://i.meee.com.tw/7cDaWyU.jpg', //025
-                'https://i.meee.com.tw/VBOiyxl.jpg', //026
-                'https://i.meee.com.tw/7RhEFsO.jpg', //027
-                'https://i.meee.com.tw/gWFHTfh.jpg', //028
-                'https://i.meee.com.tw/PMSu76m.jpg', //029
-                'https://i.meee.com.tw/2TjeXdU.jpg', //030
-                'https://i.meee.com.tw/edDiacb.jpg', //031
-                'https://i.meee.com.tw/9Ss2EVA.jpg', //032
-                'https://i.meee.com.tw/leGjRQu.jpg', //033
-                'https://i.meee.com.tw/iRghcBx.jpg', //034
-                'https://i.meee.com.tw/sIHEA1v.jpg', //035
-                'https://i.meee.com.tw/Bo8qOPs.jpg', //036
-                'https://i.meee.com.tw/f9DcHTT.jpg', //037
-                'https://i.meee.com.tw/JIfMKy7.jpg', //038
-                'https://i.meee.com.tw/i95UGif.jpg', //039
-                'https://i.meee.com.tw/xkbTgyT.jpg', //040
-                'https://i.meee.com.tw/24EydLu.jpg'  //041
-            ] 
-        }
-    ];
-
-    const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
-    const photo = document.getElementById('photo'), overlay = document.getElementById('overlay');
-    const mainBtn = document.getElementById('main-btn'), redrawBtn = document.getElementById('redraw-btn');
-    const quoteBox = document.getElementById('quote'), appCont = document.getElementById('app-container');
-
-    function trackLaunchMode() {
-        const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-        currentLaunchMode = isStandalone ? 'Home Screen' : 'Browser';
-
-        if (typeof gtag === 'function') {
-            gtag('event', 'app_launch', {
-                'launch_mode': currentLaunchMode
-            });
-        }
-    }
-
-    function updateUI() {
-        const lang = i18n[currentLang];
-
-        const introElem = document.getElementById('modal-intro');
-        if (introElem) introElem.innerHTML = lang.nameIntro;
-
-        const promptElem = document.getElementById('modal-prompt');
-        if (promptElem) promptElem.innerText = lang.namePrompt;
-
-        const btnElem = document.getElementById('modal-btn');
-        if (btnElem) btnElem.innerText = lang.nameBtn;
-
-        const inputElem = document.getElementById('user-name-input');
-        if (inputElem) inputElem.placeholder = lang.namePlaceholder;
-
-        const privacyTitle = document.getElementById('privacy-title');
-        const privacyBody = document.getElementById('privacy-body');
-        const privacyCloseBtn = document.getElementById('privacy-close-btn');
-        if (privacyTitle) privacyTitle.innerText = lang.privacyTitle;
-        if (privacyBody) privacyBody.innerHTML = lang.privacyContent;
-        if (privacyCloseBtn) privacyCloseBtn.innerText = lang.privacyClose;
-
-        document.getElementById('title-main').innerText = lang.title;
-        document.getElementById('copy-text').innerHTML = lang.copyright;
-
-        const hintText = document.getElementById('hint-text-content');
-        if (hintText) hintText.innerText = lang.scratchHint;
-
-        if (currentLang === 'zh') { appCont.classList.add('lang-zh'); appCont.classList.remove('lang-en'); } 
-        else { appCont.classList.add('lang-en'); appCont.classList.remove('lang-zh'); }
-
-        const displayUser = userName || (currentLang === 'zh' ? "朋友" : "Friend");
-        const userSpan = `&nbsp;<span class="user-clickable" onclick="resetUserName()">${displayUser}</span>&nbsp`;
-
-        if (state === 'IDLE') {
-            mainBtn.innerText = lang.pullBtn;
-            mainBtn.classList.remove('btn-active-float');
-            redrawBtn.style.display = 'none';
-            let msg = lang.welcomeMsgs[welcomeIdx];
-            quoteBox.innerHTML = msg.replace("{user}", userSpan);             
-            canvas.classList.remove('active');
-        } else if (state === 'DRAWN') {
-            mainBtn.innerText = lang.breakBtn;
-            mainBtn.classList.add('btn-active-float'); 
-            redrawBtn.innerText = lang.redrawBtn;
-            redrawBtn.style.display = 'flex';
-            const msg = lang.pullMsgs[currentPullMsgIdx]; 
-            quoteBox.innerText = msg.replace("{name}", selectedMember.name);
-        } else if (state === 'END') {
-            mainBtn.innerText = lang.pullAgain;
-            mainBtn.classList.remove('btn-active-float');
-            redrawBtn.style.display = 'none';
-            let msg = lang.successMsgs[currentSuccessMsgIdx];
-            let formattedMsg = msg.replace("{user}", userSpan)
-                                .replace("{name}", selectedMember.name);
-            quoteBox.innerHTML = formattedMsg
-        }
-    }
-
-    function toggleLanguage() {
-        currentLang = currentLang === 'zh' ? 'en' : 'zh';
-        localStorage.setItem('cortis_lang', currentLang); 
-
-        if (typeof gtag === 'function') {
-            gtag('event', 'language_change', {
-                'to_lang': currentLang
-            });
-        }
-        
-        const appCont = document.getElementById('app-container');
-        if (currentLang === 'zh') { 
-            appCont.classList.add('lang-zh'); 
-            appCont.classList.remove('lang-en'); 
-        } else { 
-            appCont.classList.add('lang-en'); 
-            appCont.classList.remove('lang-zh'); 
-        }
-        
-        updateUI();
-    }
-
-    function togglePrivacy(show) {
-        const modal = document.getElementById('privacy-modal');
-        
-        if (show) {
-            updateUI();
-            modal.style.display = 'flex';
-            setTimeout(() => modal.style.opacity = '1', 10);
-        } else {
-            modal.style.opacity = '0';
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
-    }
-
-    function handleMain() {
-        if (state === 'IDLE') pull();
-        else if (state === 'DRAWN') startPlay();
-        else if (state === 'END') resetGame();
-    }
-
-    function checkName() {
-        const modal = document.getElementById('name-modal');
-        if (userName && modal.style.display !== 'flex') {
-            modal.style.display = 'none';
-            return;
-        }
-    }
-
-    function saveName() {
-        const input = document.getElementById('user-name-input');
-        const val = input.value.trim();
-        if (!val) return;
-        
-        userName = val;
-        localStorage.setItem('cortis_user_name', userName);
-
-        const modal = document.getElementById('name-modal');
-        modal.style.opacity = '0';
-        setTimeout(() => {
-            modal.style.display = 'none';
-            updateUI(); 
-        }, 500);
-    }
-
-    function resetUserName() {
-        const modal = document.getElementById('name-modal');
-        const input = document.getElementById('user-name-input');
-        
-        modal.style.display = 'flex';
-        setTimeout(() => {
-            modal.style.opacity = '1';
-            input.value = userName;
-            input.focus();
-        }, 10);
-
-        checkName(); 
-    }
-
-    function pull() {
-        selectedMember = members[Math.floor(Math.random() * members.length)];
-        selectedImg = selectedMember.imgs[Math.floor(Math.random() * selectedMember.imgs.length)];
-
-        if (typeof gtag === 'function' && selectedMember) {
-            const imgIndex = selectedMember.imgs.indexOf(selectedImg) + 1;
-            const photoId = selectedMember.name + "_#" + imgIndex.toString().padStart(3, '0');
-
-            gtag('event', 'card_pull_success', {
-                'member_name': selectedMember.name,
-                'photo_id': photoId,
-                'launch_mode': currentLaunchMode
-            });
-        }
-
-        const imgPreload = new Image();
-        imgPreload.src = selectedImg;
-
-        currentPullMsgIdx = Math.floor(Math.random() * i18n[currentLang].pullMsgs.length);
-
-        document.getElementById('card-name').innerText = selectedMember.name;
-        document.getElementById('card-obj').classList.add('flipped');
-        
-        initCanvas(); 
-        
-        state = 'DRAWN';
-        updateUI();
-    }
-
-    function handleRedraw() {
-        if (typeof gtag === 'function' && selectedMember) {
-            gtag('event', 'card_redraw', {
-                'rejected_member': selectedMember.name
-            });
-        }
-
-        document.getElementById('card-obj').classList.remove('flipped');
-        state = 'IDLE'; updateUI(); 
-        quoteBox.innerText = i18n[currentLang].shuffling;
-        setTimeout(pull, 400);
-    }
-
-    function resetGame() {
-        state = 'IDLE';
-        document.getElementById('card-obj').classList.remove('flipped');
-        overlay.style.display = "flex"; 
-        overlay.style.opacity = "1";
-        photo.classList.remove('success-zoom');
-        const oldSparkle = document.querySelector('.sparkle-overlay');
-        if (oldSparkle) oldSparkle.remove();
-        
-        const hint = document.getElementById('scratch-hint');
-        if (hint) {
-            hint.classList.remove('active');
-            hint.style.display = "none";
-            hint.style.opacity = "0";
-        }
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        welcomeIdx = Math.floor(Math.random() * i18n[currentLang].welcomeMsgs.length);
-        updateUI();
-    }
-
-    function initCanvas() {
-        const cardWin = document.getElementById('card-window');
-        if (!cardWin) return;
-
-        const rect = document.getElementById('card-window').getBoundingClientRect();
-
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.fillStyle = '#eeeeee';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.lineWidth = 25;
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-    }
-
-    function startPlay() {
-        state = 'PLAYING';
-        document.getElementById('btn-group').classList.add('hidden-all');
-        
-        photo.style.backgroundImage = `url('${selectedImg}')`;
-        canvas.classList.add('active');
-
-        const hint = document.getElementById('scratch-hint');
-        if (hint) {
-            hint.style.display = "block"; 
-
-            setTimeout(() => {
-                hint.classList.add('active');
-                hint.style.opacity = "1";
-            }, 10);
-        }
-        
-        overlay.style.opacity = "0";
-        setTimeout(() => {
-            overlay.style.display = "none";
-        }, 400);
-        
-        progressTimer = setInterval(calcProgress, 500);
-    }
-
-    let isDrawing = false;
-    let lastX = 0, lastY = 0;
-
-    function getPos(e) {
-        const rect = canvas.getBoundingClientRect();
-        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-        return { x: clientX - rect.left, y: clientY - rect.top };
-    }
-
-    canvas.addEventListener('pointerdown', (e) => {
-        if (state !== 'PLAYING') return;
-        isDrawing = true;
-
-        const hint = document.getElementById('scratch-hint');
-        if (hint && hint.classList.contains('active')) {
-            hint.classList.remove('active');
-            hint.style.opacity = "0";
-            setTimeout(() => {
-                if (state !== 'PLAYING') return;
-                hint.style.display = "none";
-            }, 500);        
-        }
-
-        const pos = getPos(e);
-        lastX = pos.x; 
-        lastY = pos.y;
-
-        ctx.beginPath();
-        ctx.arc(pos.x, pos.y, ctx.lineWidth / 2, 0, Math.PI * 2);
-        ctx.fill();
-
-    });
-
-    window.addEventListener('pointermove', (e) => {
-        if (!isDrawing || state !== 'PLAYING') return;
-        const pos = getPos(e);
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-        lastX = pos.x; lastY = pos.y;
-    });
-
-    window.addEventListener('pointerup', () => isDrawing = false);
-
-    function calcProgress() {
-        if (state !== 'PLAYING') return;
-        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-        let clear = 0;
-        for (let i = 3; i < data.length; i += 120) { if (data[i] === 0) clear++; }
-        if ((clear / (data.length / 120)) * 100 >= 85) endPlay();
-    }
-
-    function endPlay() {
-        clearInterval(progressTimer);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        canvas.classList.remove('active');
-        photo.classList.add('success-zoom');
-
-        if (typeof gtag === 'function' && selectedMember) {
-            const imgIndex = selectedMember.imgs.indexOf(selectedImg) + 1;
-            const photoId = selectedMember.name + "_#" + imgIndex.toString().padStart(3, '0');
-
-            gtag('event', 'scratch_complete', {
-                'member_name': selectedMember.name,
-                'photo_id': photoId,
-                'launch_mode': currentLaunchMode
-            });
-        }
-
-        const sparkle = document.createElement('div');
-        sparkle.className = 'sparkle-overlay';
-        document.getElementById('card-window').appendChild(sparkle);
-        currentSuccessMsgIdx = Math.floor(Math.random() * i18n[currentLang].successMsgs.length);
-        state = 'END';
-        document.getElementById('btn-group').classList.remove('hidden-all');
-        updateUI();
-    }
-
-    document.addEventListener('gesturestart', function (e) {
-        e.preventDefault();
-    });
-
-    document.addEventListener('touchstart', function (event) {
-        if (event.touches.length > 1) {
-            event.preventDefault();
-        }
-    }, { passive: false });
-
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function (event) {
-        let now = (new Date()).getTime();
-        if (now - lastTouchEnd <= 300) {
-            event.preventDefault();
-        }
-        lastTouchEnd = now;
-    }, false);
-
-    window.onload = () => {
-        trackLaunchMode();
-        checkName(); 
-        updateUI(); 
-    };
-
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-            trackLaunchMode();
-        }
-    });
-</script>
 </body>
 </html>
